@@ -1,0 +1,6 @@
+/* MTNIMA webfonts.
+   No font binaries were supplied with the source material (the deck carried only
+   screenshots). The families below are the closest Google Fonts matches to the
+   Basarsoft / MTNIMA portal screenshots and are loaded from the Google CDN.
+   See readme.md -> "Font substitution" and replace with licensed binaries when available. */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Poppins:wght@500;600;700&family=Noto+Sans+Mono:wght@400;500&display=swap");

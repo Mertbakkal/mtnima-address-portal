@@ -1,0 +1,57 @@
+:root{
+  /* --- Brand cyan (primary). Sampled from the MTNIMA portal mockups. --- */
+  --cyan-50:#f1fbfe;
+  --cyan-100:#dff5fe;
+  --cyan-200:#b8ecfa;
+  --cyan-300:#7fdcf5;
+  --cyan-400:#42cae8;
+  --cyan-500:#08b8e6;
+  --cyan-600:#059ecb;
+  --cyan-700:#0481a6;
+  --cyan-800:#076684;
+
+  /* --- Brand navy (logo ink, panel headings) --- */
+  --navy-500:#4b6ba8;
+  --navy-600:#3a5a96;
+  --navy-700:#294884;
+  --navy-800:#182f5c;
+  --navy-900:#12244a;
+
+  /* --- Cool neutrals (blue-tinted greys of the portal chrome) --- */
+  --gray-0:#ffffff;
+  --gray-25:#fcfdfe;
+  --gray-50:#f6f8fb;
+  --gray-100:#eff2f6;
+  --gray-200:#e1e7ef;
+  --gray-300:#cbd4e0;
+  --gray-400:#a2aec1;
+  --gray-500:#7a879b;
+  --gray-600:#5a6779;
+  --gray-700:#414d5e;
+  --gray-800:#2a3342;
+  --gray-900:#17202b;
+
+  /* --- Label blue-grey used on every form label in the attribute panels --- */
+  --label-500:#5b6a8f;
+
+  /* --- Semantic hues, sampled from the validation screens --- */
+  --green-100:#e4f4e7;
+  --green-500:#3e9950;
+  --green-700:#2c7139;
+  --amber-100:#fde8cc;
+  --amber-500:#fa9c2b;
+  --amber-700:#c2741a;
+  --red-100:#fde6e6;
+  --red-500:#e5484b;
+  --red-700:#b52f32;
+  --blue-100:#e3f0fd;
+  --blue-500:#2f8fe0;
+  --blue-700:#1f69a8;
+
+  /* --- Map canvas colours (reference only; real tiles come from the map service) --- */
+  --map-water:#84caf4;
+  --map-land:#f7f6f2;
+  --map-road-primary:#fbc02d;
+  --map-highway-shield:#e5484b;
+  --map-selection:#1e88e5;
+}

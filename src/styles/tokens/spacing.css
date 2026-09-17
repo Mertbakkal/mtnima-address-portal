@@ -1,0 +1,30 @@
+:root{
+  /* 4px base step. The portal chrome uses 6/8/12/16 most; 10 and 14 appear in
+     the attribute panels and are kept as real tokens rather than snapped. */
+  --space-0:0px;
+  --space-1:2px;
+  --space-2:4px;
+  --space-3:6px;
+  --space-4:8px;
+  --space-5:10px;
+  --space-6:12px;
+  --space-7:14px;
+  --space-8:16px;
+  --space-10:20px;
+  --space-12:24px;
+  --space-16:32px;
+  --space-20:40px;
+  --space-24:48px;
+
+  /* Layout constants measured off the mockups */
+  --topbar-height:52px;
+  --toolstrip-height:76px;
+  --maptool-rail-width:56px;
+  --maptool-button-size:38px;
+  --panel-width:466px;
+  --statusbar-height:40px;
+  --control-height-sm:26px;
+  --control-height-md:32px;
+  --control-height-lg:40px;
+  --touch-target-min:44px;
+}

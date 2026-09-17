@@ -1,0 +1,8 @@
+:root{
+  --radius-xs:3px;
+  --radius-sm:5px;   /* inputs, read-only fields */
+  --radius-md:8px;   /* buttons, chips, section bands */
+  --radius-lg:12px;  /* panels, cards, map tool buttons */
+  --radius-xl:16px;  /* top-bar module tab, outer app shell */
+  --radius-full:999px;
+}
