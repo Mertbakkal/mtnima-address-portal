@@ -17,69 +17,114 @@ const RAIL_TOOL_DEFS = [
   { id: 'layers', iconName: 'map-layers', label: 'Layers' },
 ] as const;
 
-const CENTER: [number, number] = [18.0895, -15.9755];
+/** Country overview center (Mauritania). */
+const CENTER: [number, number] = [20.2, -10.9];
+const OVERVIEW_ZOOM = 6;
 
 /** Show overview color zones only when zoomed out (hide when zoomed in past this level). */
-const ZONE_MAX_ZOOM = 15;
+const ZONE_MAX_ZOOM = 9;
 
 type ZoneDef = { color: string; rings: [number, number][] };
 
-/** Decorative overview zones around Nouakchott (lat, lon rings). Visual-only. */
+/**
+ * Decorative overview zones ≈ Mauritania wilayas (lat, lon rings). Visual-only;
+ * approximate tessellation covering the country region-by-region.
+ */
 const OVERVIEW_ZONES: ZoneDef[] = [
+  // Tiris Zemmour (north)
   {
     color: '#e53935',
     rings: [
-      [18.105, -15.995], [18.112, -15.968], [18.098, -15.948], [18.078, -15.952],
-      [18.070, -15.975], [18.078, -15.998], [18.095, -16.005],
+      [27.2, -8.7], [27.0, -5.5], [25.0, -4.8], [22.8, -6.0],
+      [22.6, -8.5], [23.5, -11.0], [25.2, -12.0], [26.5, -11.5],
     ],
   },
-  {
-    color: '#e53935',
-    rings: [
-      [18.070, -15.950], [18.068, -15.930], [18.052, -15.925], [18.042, -15.942],
-      [18.048, -15.962], [18.062, -15.965],
-    ],
-  },
-  {
-    color: '#43a047',
-    rings: [
-      [18.100, -16.018], [18.108, -16.008], [18.102, -15.998], [18.090, -16.002],
-      [18.088, -16.015],
-    ],
-  },
-  {
-    color: '#1e88e5',
-    rings: [
-      [18.085, -16.022], [18.092, -16.016], [18.086, -16.008], [18.076, -16.012],
-      [18.074, -16.022],
-    ],
-  },
-  {
-    color: '#8e24aa',
-    rings: [
-      [18.072, -16.018], [18.078, -16.010], [18.070, -16.000], [18.060, -16.006],
-      [18.062, -16.018],
-    ],
-  },
-  {
-    color: '#ec407a',
-    rings: [
-      [18.060, -16.012], [18.066, -16.002], [18.058, -15.992], [18.048, -15.998],
-      [18.050, -16.012],
-    ],
-  },
+  // Adrar (central north)
   {
     color: '#fb8c00',
     rings: [
-      [18.055, -15.990], [18.062, -15.980], [18.055, -15.970], [18.045, -15.975],
-      [18.046, -15.988],
+      [22.6, -8.5], [22.8, -6.0], [21.2, -6.2], [19.8, -8.0],
+      [19.6, -11.5], [20.5, -13.2], [21.8, -13.0], [22.6, -11.0],
     ],
   },
+  // Dakhlet Nouadhibou (NW coast)
   {
     color: '#00acc1',
     rings: [
-      [18.115, -15.985], [18.120, -15.972], [18.112, -15.962], [18.105, -15.970],
-      [18.108, -15.985],
+      [21.4, -17.1], [21.5, -15.6], [20.8, -15.4], [20.2, -15.8],
+      [20.0, -16.8], [20.5, -17.1],
+    ],
+  },
+  // Inchiri
+  {
+    color: '#43a047',
+    rings: [
+      [21.8, -15.6], [21.8, -13.0], [20.5, -13.2], [19.8, -14.2],
+      [19.6, -15.8], [20.2, -16.0], [20.8, -15.4],
+    ],
+  },
+  // Trarza + Nouakchott (SW coast)
+  {
+    color: '#1e88e5',
+    rings: [
+      [19.6, -15.8], [19.8, -14.2], [18.6, -14.0], [16.8, -14.2],
+      [16.0, -15.0], [16.2, -16.5], [17.5, -16.3], [18.5, -16.1], [19.2, -16.0],
+    ],
+  },
+  // Brakna
+  {
+    color: '#8e24aa',
+    rings: [
+      [18.6, -14.0], [18.4, -12.2], [16.8, -12.0], [16.2, -13.2],
+      [16.8, -14.2],
+    ],
+  },
+  // Tagant
+  {
+    color: '#ec407a',
+    rings: [
+      [19.8, -11.5], [19.8, -8.0], [18.2, -8.2], [17.2, -10.0],
+      [17.4, -12.0], [18.4, -12.2], [19.6, -11.5],
+    ],
+  },
+  // Gorgol
+  {
+    color: '#5e35b1',
+    rings: [
+      [16.8, -14.2], [16.8, -12.0], [15.6, -12.0], [15.2, -12.8],
+      [15.4, -13.8], [16.0, -15.0],
+    ],
+  },
+  // Assaba
+  {
+    color: '#00897b',
+    rings: [
+      [17.4, -12.0], [17.2, -10.0], [16.0, -10.0], [15.4, -11.2],
+      [15.6, -12.0], [16.8, -12.0],
+    ],
+  },
+  // Guidimaka (far south)
+  {
+    color: '#c0ca33',
+    rings: [
+      [15.6, -12.0], [15.4, -11.2], [14.8, -11.0], [14.7, -12.2],
+      [15.2, -12.8],
+    ],
+  },
+  // Hodh El Gharbi
+  {
+    color: '#ef6c00',
+    rings: [
+      [17.2, -10.0], [17.4, -8.2], [16.2, -8.0], [15.4, -9.0],
+      [15.4, -11.2], [16.0, -10.0],
+    ],
+  },
+  // Hodh Ech Chargui (east)
+  {
+    color: '#d81b60',
+    rings: [
+      [19.8, -8.0], [21.2, -6.2], [19.5, -5.0], [16.8, -5.5],
+      [15.8, -7.0], [16.2, -8.0], [17.4, -8.2], [18.2, -8.2],
     ],
   },
 ];
@@ -136,7 +181,7 @@ export function MapCanvas({
   railToolRef.current = railTool;
   const toolRef = useRef(tool);
   toolRef.current = tool;
-  const [zoom, setZoom] = useState(14);
+  const [zoom, setZoom] = useState(OVERVIEW_ZOOM);
   const [points, setPoints] = useState<AddressPoint[]>([]);
   const [draft, setDraft] = useState<[number, number][]>([]);
   const [, tick] = useState(0);
@@ -153,7 +198,7 @@ export function MapCanvas({
 
   useEffect(() => {
     if (!host.current) return;
-    const map = L.map(host.current, { center: CENTER, zoom: 14, zoomControl: false, attributionControl: true });
+    const map = L.map(host.current, { center: CENTER, zoom: OVERVIEW_ZOOM, zoomControl: false, attributionControl: true });
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
     drawLayer.current = L.layerGroup().addTo(map);
 
@@ -161,10 +206,10 @@ export function MapCanvas({
     OVERVIEW_ZONES.forEach((z) => {
       L.polygon(z.rings, {
         color: z.color,
-        weight: 1.5,
-        opacity: 0.85,
+        weight: 1.25,
+        opacity: 0.75,
         fillColor: z.color,
-        fillOpacity: 0.38,
+        fillOpacity: 0.28,
         interactive: false,
       }).addTo(zones);
     });
@@ -302,7 +347,7 @@ export function MapCanvas({
           onZoomOut={() => mapRef.current?.zoomOut()}
           levelLabel="Zoom level" zoomInLabel="Zoom in" zoomOutLabel="Zoom out"
           extras={<IconButton shape="rail" icon={<Icon name="map-pin" size={20} />} label="My location"
-            onClick={() => mapRef.current?.setView(CENTER, 14)} />} />
+            onClick={() => mapRef.current?.setView(CENTER, OVERVIEW_ZOOM)} />} />
       </div>
     </div>
   );
