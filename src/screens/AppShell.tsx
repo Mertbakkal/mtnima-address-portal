@@ -23,7 +23,6 @@ const STRIP_TOOL_DEFS = [
   { id: 'draw', iconName: 'tool-street-draw', label: 'Draw Street' },
   { id: 'point', iconName: 'tool-address-point', label: 'Draw Address Point' },
   { id: 'move', iconName: 'tool-address-move', label: 'Move Point' },
-  { id: 'ainfo', iconName: 'tool-address-info', label: 'Info' },
 ] as const;
 
 export function AppShell() {
@@ -46,7 +45,7 @@ export function AppShell() {
     const next = (tool === id ? null : id) as ToolId;
     setTool(next);
     if (next === 'draw' || next === 'point') { setPanel(null); setPoint(null); }
-    if (next !== null && railTool === 'delete') setRailTool('pan');
+    if (next !== null && railTool === 'info') setRailTool('pan');
   };
   const pickModule = (id: string) => {
     const m = id as ModuleId;
@@ -63,7 +62,11 @@ export function AppShell() {
   };
   const pickRailTool = (id: string) => {
     setRailTool(id);
-    if (id === 'delete' && (tool === 'draw' || tool === 'point')) setTool(null);
+    if (id === 'info') {
+      setTool('ainfo');
+    } else if (tool === 'ainfo') {
+      setTool(null);
+    }
   };
 
   const stripTools = STRIP_TOOL_DEFS.map((t) => ({ ...t, icon: <Icon name={t.iconName} size={24} /> }));
@@ -89,10 +92,8 @@ export function AppShell() {
       </div>
       <div style={{ position: 'relative', flex: 1, display: 'flex', minHeight: 0 }}>
         <MapCanvas railTool={railTool} onRailTool={pickRailTool} tool={tool} selectedPoint={point} cursor={cursor} onCursor={setCursor}
-          onSelectPoint={(id) => { if (tool === 'point' || tool === 'draw') return; setPoint(id); setModule('address'); setTool('ainfo'); setPanel('address'); }}
+          onSelectPoint={(id) => { if (tool === 'point' || tool === 'draw') return; setPoint(id); setModule('address'); setRailTool('info'); setTool('ainfo'); setPanel('address'); }}
           onSelectStreet={() => { setModule('address'); setPanel('street'); }}
-          onPointDeleted={(id) => { if (point === id) { setPoint(null); setPanel(null); } }}
-          onStreetDeleted={() => { if (panel === 'street') setPanel(null); }}
           focusRequest={focusRequest} />
         {panel && (
           <div style={{ position: 'absolute', top: 12, right: 12, bottom: 12, display: 'flex', zIndex: 700 }}>

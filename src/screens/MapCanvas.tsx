@@ -9,12 +9,16 @@ import { IconButton } from '../components/core/IconButton';
 import type { ToolId } from './AppShell';
 
 const RAIL_TOOL_DEFS = [
-  { id: 'info', iconName: 'map-info', label: 'Identify' },
-  { id: 'pan', iconName: 'map-pan', label: 'Pan' },
-  { id: 'box', iconName: 'map-select-box', label: 'Select area' },
-  { id: 'measure', iconName: 'map-measure', label: 'Measure' },
-  { id: 'undo', iconName: 'map-undo', label: 'Undo' },
-  { id: 'layers', iconName: 'map-layers', label: 'Layers' },
+  { id: 'star', iconName: 'rail-star', label: 'Favorites' },
+  { id: 'info', iconName: 'rail-info', label: 'Info' },
+  { id: 'pan', iconName: 'rail-pan', label: 'Pan' },
+  { id: 'clear', iconName: 'rail-clear', label: 'Clear' },
+  { id: 'satellite', iconName: 'rail-satellite', label: 'Satellite' },
+  { id: 'locate', iconName: 'rail-locate', label: 'Locate' },
+  { id: 'extent', iconName: 'rail-extent', label: 'Extent' },
+  { id: 'measure', iconName: 'rail-measure', label: 'Measure' },
+  { id: 'cloud', iconName: 'rail-cloud', label: 'Cloud' },
+  { id: 'target', iconName: 'rail-target', label: 'Target' },
 ] as const;
 
 /** Country overview center (Mauritania). */
@@ -130,17 +134,6 @@ const OVERVIEW_ZONES: ZoneDef[] = [
 ];
 
 
-function TrashIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--icon-default)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M4 7h16" />
-      <path d="M9 7V4h6v3" />
-      <path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" />
-      <path d="M10 11v6M14 11v6" />
-    </svg>
-  );
-}
-
 interface AddressPoint {
   id: string;
   lat: number;
@@ -170,15 +163,13 @@ export interface MapCanvasProps {
 }
 
 export function MapCanvas({
-  railTool, onRailTool, tool, selectedPoint, onCursor, onSelectPoint, onSelectStreet, onPointDeleted, onStreetDeleted, focusRequest,
+  railTool, onRailTool, tool, selectedPoint, onCursor, onSelectPoint, onSelectStreet, focusRequest,
 }: MapCanvasProps) {
   const host = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const drawLayer = useRef<L.LayerGroup | null>(null);
   const zoneLayer = useRef<L.LayerGroup | null>(null);
   const draftRef = useRef<[number, number][]>([]);
-  const railToolRef = useRef(railTool);
-  railToolRef.current = railTool;
   const toolRef = useRef(tool);
   toolRef.current = tool;
   const [zoom, setZoom] = useState(OVERVIEW_ZOOM);
@@ -237,11 +228,6 @@ export function MapCanvas({
     if (pts && pts.length > 1 && drawLayer.current) {
       const line = L.polyline(pts, { color: '#2f8fe0', weight: 4, opacity: 0.95 }).addTo(drawLayer.current);
       line.on('click', () => {
-        if (railToolRef.current === 'delete') {
-          drawLayer.current?.removeLayer(line);
-          onStreetDeleted?.();
-          return;
-        }
         if (toolRef.current === 'draw') return;
         onSelectStreet();
       });
@@ -277,8 +263,8 @@ export function MapCanvas({
     const map = mapRef.current;
     if (!map) return;
     map.getContainer().style.cursor =
-      tool === 'draw' || tool === 'point' ? 'crosshair' : railTool === 'delete' ? 'pointer' : '';
-  }, [tool, railTool]);
+      tool === 'draw' || tool === 'point' ? 'crosshair' : '';
+  }, [tool]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -295,20 +281,10 @@ export function MapCanvas({
     return { left: q.x, top: q.y };
   };
 
-  const iconRailTools = RAIL_TOOL_DEFS.map((t) => ({ ...t, icon: <Icon name={t.iconName} size={20} /> }));
-  const railTools = [
-    ...iconRailTools.slice(0, 5),
-    { id: 'delete', label: 'Delete', icon: <TrashIcon /> },
-    ...iconRailTools.slice(5),
-  ];
+  const railTools = RAIL_TOOL_DEFS.map((t) => ({ ...t, icon: <Icon name={t.iconName} size={20} /> }));
   const draftPx = mapRef.current ? draft.map((ll) => mapRef.current!.latLngToContainerPoint(ll)) : [];
 
   const handleMarkerActivate = (id: string) => {
-    if (railTool === 'delete') {
-      setPoints((ps) => ps.filter((pt) => pt.id !== id));
-      onPointDeleted?.(id);
-      return;
-    }
     onSelectPoint(id);
   };
 

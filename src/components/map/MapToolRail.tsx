@@ -23,7 +23,7 @@ export function MapToolRail({ tools = [], value, onChange, side = 'left', ariaLa
   return (
     <div role="toolbar" aria-orientation="vertical" aria-label={ariaLabel} style={{
       width: 'var(--maptool-rail-width)', display: 'flex', flexDirection: 'column',
-      alignItems: 'center', gap: 'var(--space-5)', padding: 'var(--space-6) 0',
+      alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-5) 0',
       [side === 'left' ? 'paddingLeft' : 'paddingRight']: 'var(--space-5)', ...style,
     }}>
       {tools.map((t) => (
