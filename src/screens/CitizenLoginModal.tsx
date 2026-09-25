@@ -4,6 +4,7 @@ import { Icon } from '../components/core/Icon';
 
 export interface CitizenLoginModalProps {
   onClose: () => void;
+  onLogin?: () => void;
 }
 
 const headerBtnStyle: CSSProperties = {
@@ -94,7 +95,7 @@ const fieldInputStyle: CSSProperties = {
   height: '100%',
 };
 
-export function CitizenLoginModal({ onClose }: CitizenLoginModalProps) {
+export function CitizenLoginModal({ onClose, onLogin }: CitizenLoginModalProps) {
   const [minimized, setMinimized] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -102,6 +103,7 @@ export function CitizenLoginModal({ onClose }: CitizenLoginModalProps) {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    onLogin?.();
     onClose();
   };
 

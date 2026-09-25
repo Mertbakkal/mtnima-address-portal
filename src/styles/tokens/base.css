@@ -8,3 +8,4 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 ::placeholder{color:var(--text-placeholder)}
 code,kbd,samp{font-family:var(--font-mono)}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms !important;transition-duration:.01ms !important}}
+.leaflet-div-icon.base-grid-label{background:transparent;border:none}
