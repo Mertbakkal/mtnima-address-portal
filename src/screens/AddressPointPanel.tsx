@@ -10,6 +10,8 @@ import { Button } from '../components/core/Button';
 import { Icon } from '../components/core/Icon';
 import { StatusBadge } from '../components/core/StatusBadge';
 import { buildAddressDemand, type AddressDemand } from '../data/addressDemand';
+import { useI18n } from '../i18n/LocaleProvider';
+import { catalogOptions } from '../i18n/messages';
 
 export interface AddressPointPanelProps {
   pointId?: string | null;
@@ -81,57 +83,58 @@ function AccordionSection({
 export function AddressPointPanel({
   pointId, demandOpen = false, onOpenDemand, onClose, onDelete,
 }: AddressPointPanelProps) {
+  const { m } = useI18n();
   const [locationOpen, setLocationOpen] = useState(false);
   const [buildingOpen, setBuildingOpen] = useState(false);
   const [demandSectionOpen, setDemandSectionOpen] = useState(false);
   const demand = buildAddressDemand(pointId || 'address');
 
   return (
-    <AttributePanel width="420px" title="Address Point" onClose={onClose}
+    <AttributePanel width="420px" title={m.address.title} onClose={onClose}
       footer={<>
-        <Button variant="danger" onClick={onDelete}>Delete</Button>
-        <Button variant="secondary" icon={<Icon name="map-pin" size={16} />}>Center</Button>
-        <Button style={{ marginLeft: 'auto' }}>Edit</Button>
+        <Button variant="danger" onClick={onDelete}>{m.common.delete}</Button>
+        <Button variant="secondary" icon={<Icon name="map-pin" size={16} />}>{m.common.center}</Button>
+        <Button style={{ marginLeft: 'auto' }}>{m.common.edit}</Button>
       </>}>
       <AccordionSection
-        title="Location"
+        title={m.address.location}
         icon={<Icon name="section-location" size={20} />}
         open={locationOpen}
         onToggle={() => setLocationOpen((v) => !v)}
       >
         <div style={{ padding: '10px 14px' }}>
-          <FormRow labelWidth="124px" label="Digital address"><ReadOnlyField mono value="NC02-A05-082916" /></FormRow>
-          <FormRow labelWidth="124px" label="Coordinates"><ReadOnlyField mono value="18.085312, -15.978451" /></FormRow>
-          <FormRow labelWidth="124px" label="Wilaya"><ReadOnlyField value="Nouakchott" /></FormRow>
-          <FormRow labelWidth="124px" label="Moughataa"><ReadOnlyField value="Tevragh Zeina" /></FormRow>
-          <FormRow labelWidth="124px" label="Street"><SearchField value="Rue de l'Amitié" onChange={() => {}} /></FormRow>
+          <FormRow labelWidth="124px" label={m.address.digitalAddress}><ReadOnlyField mono value="NC02-A05-082916" /></FormRow>
+          <FormRow labelWidth="124px" label={m.address.coordinates}><ReadOnlyField mono value="18.085312, -15.978451" /></FormRow>
+          <FormRow labelWidth="124px" label={m.address.wilaya}><ReadOnlyField value="Nouakchott" /></FormRow>
+          <FormRow labelWidth="124px" label={m.address.moughataa}><ReadOnlyField value="Tevragh Zeina" /></FormRow>
+          <FormRow labelWidth="124px" label={m.address.street}><SearchField value="Rue de l'Amitié" onChange={() => {}} /></FormRow>
         </div>
       </AccordionSection>
       <AccordionSection
-        title="Building"
+        title={m.address.building}
         icon={<Icon name="section-basic-info" size={20} />}
         open={buildingOpen}
         onToggle={() => setBuildingOpen((v) => !v)}
       >
         <div style={{ padding: '10px 14px' }}>
-          <FormRow labelWidth="124px" label="Building type"><Select defaultValue="Residential" placeholder={null} options={['Residential', 'Commercial', 'Public']} /></FormRow>
-          <FormRow labelWidth="124px" label="Use type"><Select defaultValue="Residential" placeholder={null} options={['Residential', 'Business', 'Storage']} /></FormRow>
-          <FormRow labelWidth="124px" label="Postal code"><Input mono defaultValue="1000" /></FormRow>
-          <FormRow labelWidth="124px" label="Validation"><StatusBadge tone="success">Validated</StatusBadge></FormRow>
-          <FormRow layout="stacked" label="Field note"><Textarea rows={2} readOnlyLook defaultValue="Single-storey house with a wall and iron gate on the street frontage." /></FormRow>
+          <FormRow labelWidth="124px" label={m.address.buildingType}><Select defaultValue="Residential" placeholder={null} options={catalogOptions(m.catalog, ['Residential', 'Commercial', 'Public'])} /></FormRow>
+          <FormRow labelWidth="124px" label={m.address.useType}><Select defaultValue="Residential" placeholder={null} options={catalogOptions(m.catalog, ['Residential', 'Business', 'Storage'])} /></FormRow>
+          <FormRow labelWidth="124px" label={m.address.postalCode}><Input mono defaultValue="1000" /></FormRow>
+          <FormRow labelWidth="124px" label={m.address.validation}><StatusBadge tone="success">{m.catalog.Validated}</StatusBadge></FormRow>
+          <FormRow layout="stacked" label={m.address.fieldNote}><Textarea rows={2} readOnlyLook defaultValue={m.address.fieldNoteText} /></FormRow>
         </div>
       </AccordionSection>
       <AccordionSection
-        title="Demand"
+        title={m.address.demand}
         open={demandSectionOpen}
         onToggle={() => setDemandSectionOpen((v) => !v)}
       >
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, fontFamily: 'var(--font-ui)' }}>
           <thead>
             <tr style={{ background: 'var(--gray-100)' }}>
-              <th style={th}>Identifier</th>
-              <th style={th}>Date</th>
-              <th style={th}>Status</th>
+              <th style={th}>{m.address.identifier}</th>
+              <th style={th}>{m.address.date}</th>
+              <th style={th}>{m.address.status}</th>
             </tr>
           </thead>
           <tbody>
@@ -144,7 +147,7 @@ export function AddressPointPanel({
             >
               <td style={td}>{demand.identifier}</td>
               <td style={td}>{demand.date}</td>
-              <td style={td}><StatusBadge tone="pending" size="sm">Pending</StatusBadge></td>
+              <td style={td}><StatusBadge tone="pending" size="sm">{m.catalog.Pending}</StatusBadge></td>
             </tr>
           </tbody>
         </table>

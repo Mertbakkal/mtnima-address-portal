@@ -1,6 +1,7 @@
 import { useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
 import { Button } from '../components/core/Button';
 import { Icon } from '../components/core/Icon';
+import { useI18n } from '../i18n/LocaleProvider';
 
 export interface CitizenLoginModalProps {
   onClose: () => void;
@@ -96,6 +97,7 @@ const fieldInputStyle: CSSProperties = {
 };
 
 export function CitizenLoginModal({ onClose, onLogin }: CitizenLoginModalProps) {
+  const { m } = useI18n();
   const [minimized, setMinimized] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -110,7 +112,7 @@ export function CitizenLoginModal({ onClose, onLogin }: CitizenLoginModalProps) 
   return (
     <div
       role="dialog"
-      aria-label="Login"
+      aria-label={m.login.title}
       style={{
         width: minimized ? 320 : 420,
         maxWidth: 'calc(100vw - 24px)',
@@ -144,12 +146,12 @@ export function CitizenLoginModal({ onClose, onLogin }: CitizenLoginModalProps) 
             color: 'var(--text-on-accent)',
           }}
         >
-          Login
+          {m.login.title}
         </h2>
         <button
           type="button"
-          title={minimized ? 'Restore' : 'Minimize'}
-          aria-label={minimized ? 'Restore' : 'Minimize'}
+          title={minimized ? m.common.restore : m.common.minimize}
+          aria-label={minimized ? m.common.restore : m.common.minimize}
           onClick={() => setMinimized((m) => !m)}
           style={headerBtnStyle}
         >
@@ -157,7 +159,7 @@ export function CitizenLoginModal({ onClose, onLogin }: CitizenLoginModalProps) 
             <path d="M5 12h14" />
           </svg>
         </button>
-        <button type="button" title="Close" aria-label="Close" onClick={onClose} style={headerBtnStyle}>
+        <button type="button" title={m.common.close} aria-label={m.common.close} onClick={onClose} style={headerBtnStyle}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
             <path d="M5 5l14 14M19 5L5 19" />
           </svg>
@@ -177,7 +179,7 @@ export function CitizenLoginModal({ onClose, onLogin }: CitizenLoginModalProps) 
                 lineHeight: 'var(--leading-snug)',
               }}
             >
-              Log into your account
+              {m.login.heading}
             </h3>
             <p
               style={{
@@ -188,7 +190,7 @@ export function CitizenLoginModal({ onClose, onLogin }: CitizenLoginModalProps) 
                 lineHeight: 'var(--leading-normal)',
               }}
             >
-              You can log in with your username and password.
+              {m.login.hint}
             </p>
           </div>
 
@@ -197,10 +199,10 @@ export function CitizenLoginModal({ onClose, onLogin }: CitizenLoginModalProps) 
               type="text"
               name="username"
               autoComplete="username"
-              placeholder="Username or Email"
+              placeholder={m.login.usernameOrEmail}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              aria-label="Username or Email"
+              aria-label={m.login.usernameOrEmail}
               style={fieldInputStyle}
             />
           </IconField>
@@ -210,8 +212,8 @@ export function CitizenLoginModal({ onClose, onLogin }: CitizenLoginModalProps) 
             trailing={
               <button
                 type="button"
-                title={showPassword ? 'Hide password' : 'Show password'}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                title={showPassword ? m.login.hidePassword : m.login.showPassword}
+                aria-label={showPassword ? m.login.hidePassword : m.login.showPassword}
                 onClick={() => setShowPassword((v) => !v)}
                 style={{
                   display: 'flex',
@@ -233,10 +235,10 @@ export function CitizenLoginModal({ onClose, onLogin }: CitizenLoginModalProps) 
               type={showPassword ? 'text' : 'password'}
               name="password"
               autoComplete="current-password"
-              placeholder="Password"
+              placeholder={m.login.password}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              aria-label="Password"
+              aria-label={m.login.password}
               style={fieldInputStyle}
             />
           </IconField>
@@ -244,7 +246,7 @@ export function CitizenLoginModal({ onClose, onLogin }: CitizenLoginModalProps) 
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button type="submit" variant="primary">
               <CheckIcon />
-              Login
+              {m.login.submit}
             </Button>
           </div>
         </form>

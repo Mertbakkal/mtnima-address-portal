@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useI18n } from '../../i18n/LocaleProvider';
 
 export interface WorkspaceNavItem {
   id: string;
@@ -53,9 +54,11 @@ export function WorkspaceNav({
   dropdownValue = null,
   onSelect,
   onDropdownSelect,
-  ariaLabel = 'Workspace',
+  ariaLabel,
   style,
 }: WorkspaceNavProps) {
+  const { m } = useI18n();
+  const navLabel = ariaLabel ?? m.nav.workspace;
   const [collapsed, setCollapsed] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -72,7 +75,7 @@ export function WorkspaceNav({
     <div ref={rootRef} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', ...style }}>
       {!collapsed && (
         <nav
-          aria-label={ariaLabel}
+          aria-label={navLabel}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -193,8 +196,8 @@ export function WorkspaceNav({
 
       <button
         type="button"
-        title={collapsed ? 'Show menu' : 'Hide menu'}
-        aria-label={collapsed ? 'Show menu' : 'Hide menu'}
+        title={collapsed ? m.nav.showMenu : m.nav.hideMenu}
+        aria-label={collapsed ? m.nav.showMenu : m.nav.hideMenu}
         aria-expanded={!collapsed}
         onClick={() => { setCollapsed((c) => !c); setOpenMenu(null); }}
         style={{

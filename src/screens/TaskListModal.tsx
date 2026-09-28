@@ -4,6 +4,7 @@ import { Input } from '../components/forms/Input';
 import { createMission, SEED_MISSIONS, type TaskMission } from '../data/taskMissions';
 import type { MapFocus } from '../data/hierarchySearch';
 import { TaskDetailsWizard, type DutyPlaceMode } from './TaskDetailsWizard';
+import { useI18n } from '../i18n/LocaleProvider';
 
 export interface TaskListModalProps {
   onClose: () => void;
@@ -81,6 +82,7 @@ export function TaskListModal({
   onHierarchyFocus,
   mapDrawMode = false,
 }: TaskListModalProps) {
+  const { m } = useI18n();
   const [missions, setMissions] = useState<TaskMission[]>(() => [...SEED_MISSIONS]);
   const [query, setQuery] = useState('');
   const [pageSize, setPageSize] = useState(5);
@@ -163,7 +165,7 @@ export function TaskListModal({
   return (
     <div
       role="dialog"
-      aria-label="Task Management"
+      aria-label={m.tasks.title}
       style={{
         width: shellWidth,
         maxHeight: 'calc(100vh - 100px)',
@@ -199,12 +201,12 @@ export function TaskListModal({
             color: 'var(--text-on-accent)',
           }}
         >
-          Task Management
+          {m.tasks.title}
         </h2>
         <button
           type="button"
-          title="Close"
-          aria-label="Close"
+          title={m.common.close}
+          aria-label={m.common.close}
           onClick={onClose}
           style={{
             width: 28,
@@ -240,10 +242,10 @@ export function TaskListModal({
                 color: 'var(--text-heading)',
               }}
             >
-              Task List
+              {m.tasks.list}
             </h3>
             <Button variant="success" size="sm" onClick={handleNewMission}>
-              + New Mission
+              {m.tasks.newMission}
             </Button>
           </div>
 
@@ -252,14 +254,14 @@ export function TaskListModal({
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <path d="M4 6h16M7 12h10M10 18h4" />
               </svg>
-              Clear
+              {m.common.clear}
             </Button>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 200 }}>
               <Input
                 value={query}
                 onChange={(e) => { setQuery(e.target.value); setPage(0); }}
-                placeholder="Search"
-                aria-label="Search"
+                placeholder={m.common.search}
+                aria-label={m.common.search}
                 style={{ flex: 1 }}
               />
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--icon-default)" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true" style={{ flexShrink: 0 }}>
@@ -288,7 +290,7 @@ export function TaskListModal({
             >
               <thead>
                 <tr style={{ background: 'var(--gray-100)' }}>
-                  <th style={{ padding: '8px 10px', width: 72, borderBottom: '1px solid var(--border-panel)' }} aria-label="Actions" />
+                  <th style={{ padding: '8px 10px', width: 72, borderBottom: '1px solid var(--border-panel)' }} aria-label={m.tasks.actions} />
                   <th
                     style={{
                       padding: '8px 10px',
@@ -302,7 +304,7 @@ export function TaskListModal({
                     onClick={() => toggleSort('name')}
                   >
                     <span style={{ display: 'inline-flex', alignItems: 'center' }}>
-                      Task
+                      {m.tasks.task}
                       <SortFilterIcons />
                     </span>
                   </th>
@@ -320,7 +322,7 @@ export function TaskListModal({
                     onClick={() => toggleSort('createdAt')}
                   >
                     <span style={{ display: 'inline-flex', alignItems: 'center' }}>
-                      Creation Date
+                      {m.tasks.createdAt}
                       <SortFilterIcons />
                     </span>
                   </th>
@@ -330,7 +332,7 @@ export function TaskListModal({
                 {pageRows.length === 0 ? (
                   <tr>
                     <td colSpan={3} style={{ padding: '20px 10px', textAlign: 'center', color: 'var(--gray-500)' }}>
-                      No missions found
+                      {m.tasks.empty}
                     </td>
                   </tr>
                 ) : (
@@ -338,13 +340,13 @@ export function TaskListModal({
                     <tr key={row.id} style={{ background: i % 2 === 0 ? 'var(--surface-page)' : 'var(--blue-100)' }}>
                       <td style={{ padding: '7px 10px', borderBottom: '1px solid var(--border-panel)' }}>
                         <div style={{ display: 'flex', gap: 6 }}>
-                          <ActionCircle label={`Edit ${row.name}`} onClick={() => handleEdit(row)}>
+                          <ActionCircle label={m.tasks.edit(row.name)} onClick={() => handleEdit(row)}>
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                               <path d="M12 20h9" />
                               <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
                             </svg>
                           </ActionCircle>
-                          <ActionCircle label={`Delete ${row.name}`} onClick={() => handleDelete(row.id)}>
+                          <ActionCircle label={m.tasks.delete(row.name)} onClick={() => handleDelete(row.id)}>
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                               <path d="M3 6h18" />
                               <path d="M8 6V4h8v2" />
@@ -388,7 +390,7 @@ export function TaskListModal({
             }}
           >
             <select
-              aria-label="Rows per page"
+              aria-label={m.tasks.rowsPerPage}
               value={pageSize}
               onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
               style={{
@@ -406,13 +408,13 @@ export function TaskListModal({
               ))}
             </select>
             <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <PageNavButton label="First page" disabled={safePage === 0} onClick={() => setPage(0)}>«</PageNavButton>
-              <PageNavButton label="Previous page" disabled={safePage === 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>‹</PageNavButton>
-              <PageNavButton label="Next page" disabled={safePage >= pageCount - 1} onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}>›</PageNavButton>
-              <PageNavButton label="Last page" disabled={safePage >= pageCount - 1} onClick={() => setPage(pageCount - 1)}>»</PageNavButton>
+              <PageNavButton label={m.tasks.first} disabled={safePage === 0} onClick={() => setPage(0)}>«</PageNavButton>
+              <PageNavButton label={m.tasks.previous} disabled={safePage === 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>‹</PageNavButton>
+              <PageNavButton label={m.tasks.next} disabled={safePage >= pageCount - 1} onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}>›</PageNavButton>
+              <PageNavButton label={m.tasks.last} disabled={safePage >= pageCount - 1} onClick={() => setPage(pageCount - 1)}>»</PageNavButton>
             </div>
             <span>
-              {from} to {to} of {filtered.length}
+              {m.tasks.range(from, to, filtered.length)}
             </span>
           </div>
         </div>

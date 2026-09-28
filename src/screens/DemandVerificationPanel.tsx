@@ -2,6 +2,8 @@ import type { CSSProperties } from 'react';
 import { Button } from '../components/core/Button';
 import { PhotoThumb } from '../components/panels/PhotoThumb';
 import type { AddressDemand } from '../data/addressDemand';
+import { useI18n } from '../i18n/LocaleProvider';
+import { catalogLabel } from '../i18n/messages';
 
 export interface DemandVerificationPanelProps {
   demand: AddressDemand;
@@ -21,8 +23,9 @@ const navyButton: CSSProperties = {
 };
 
 export function DemandVerificationPanel({ demand, onClose }: DemandVerificationPanelProps) {
+  const { m } = useI18n();
   return (
-    <aside aria-label="Demand verification" style={{
+    <aside aria-label={m.demand.title} style={{
       width: 340,
       maxWidth: '100%',
       height: '100%',
@@ -49,7 +52,7 @@ export function DemandVerificationPanel({ demand, onClose }: DemandVerificationP
             fontSize: 'var(--text-lg)',
             fontWeight: 'var(--weight-semibold)',
             color: 'var(--text-heading)',
-          }}>Demand verification</h2>
+          }}>{m.demand.title}</h2>
           <div style={{
             marginTop: 4,
             fontFamily: 'var(--font-mono)',
@@ -61,8 +64,8 @@ export function DemandVerificationPanel({ demand, onClose }: DemandVerificationP
         </div>
         <button
           type="button"
-          title="Close"
-          aria-label="Close demand"
+          title={m.common.close}
+          aria-label={m.demand.close}
           onClick={onClose}
           style={{
             width: 28,
@@ -85,25 +88,25 @@ export function DemandVerificationPanel({ demand, onClose }: DemandVerificationP
       </div>
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '14px 14px 18px', display: 'grid', gap: 14, alignContent: 'start' }}>
         <div style={{ display: 'flex', gap: 12 }}>
-          <PhotoThumb src={demand.photos[0] ?? undefined} caption="Photo 1" alt="Demand photo 1" width={140} height={100} />
-          <PhotoThumb src={demand.photos[1] ?? undefined} caption="Photo 2" alt="Demand photo 2" width={140} height={100} />
+          <PhotoThumb src={demand.photos[0] ?? undefined} caption={m.demand.photo1} alt={m.demand.photoAlt(1)} width={140} height={100} />
+          <PhotoThumb src={demand.photos[1] ?? undefined} caption={m.demand.photo2} alt={m.demand.photoAlt(2)} width={140} height={100} />
         </div>
         <div>
-          <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-heading)', marginBottom: 8 }}>Information</div>
-          <InfoLine label="ID" value={demand.identifier} mono />
-          <InfoLine label="Full name" value={demand.fullName} />
-          <InfoLine label="Phone number" value={demand.phone} />
-          <InfoLine label="Document" value={demand.documents[0]} />
-          <InfoLine label="Document" value={demand.documents[1]} />
+          <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-heading)', marginBottom: 8 }}>{m.common.information}</div>
+          <InfoLine label={m.demand.id} value={demand.identifier} mono />
+          <InfoLine label={m.demand.fullName} value={demand.fullName} />
+          <InfoLine label={m.demand.phone} value={demand.phone} />
+          <InfoLine label={m.demand.document} value={catalogLabel(m.catalog, demand.documents[0])} />
+          <InfoLine label={m.demand.document} value={catalogLabel(m.catalog, demand.documents[1])} />
         </div>
         <div style={{ display: 'grid', gap: 8 }}>
-          <Button block style={navyButton}>Show demand on the map</Button>
-          <Button block style={navyButton}>Change the demand address</Button>
+          <Button block style={navyButton}>{m.demand.showOnMap}</Button>
+          <Button block style={navyButton}>{m.demand.changeAddress}</Button>
           <Button block variant="success" style={{ height: 'auto', minHeight: 44, whiteSpace: 'normal', textAlign: 'center', padding: '8px 12px' }}>
-            Accept the demand (and certify the address)
+            {m.demand.accept}
           </Button>
           <Button block variant="danger" style={{ ...navyButton, background: 'var(--red-500)', borderColor: 'var(--red-500)', color: '#fff' }}>
-            Do not accept
+            {m.demand.reject}
           </Button>
         </div>
       </div>

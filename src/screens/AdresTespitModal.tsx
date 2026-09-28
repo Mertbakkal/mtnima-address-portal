@@ -2,6 +2,8 @@ import { useRef, useState, type CSSProperties, type ChangeEvent, type ReactNode 
 import { Button } from '../components/core/Button';
 import { Input } from '../components/forms/Input';
 import { Select } from '../components/forms/Select';
+import { useI18n } from '../i18n/LocaleProvider';
+import { catalogOptions } from '../i18n/messages';
 
 export interface AdresTespitModalProps {
   onClose: () => void;
@@ -9,16 +11,9 @@ export interface AdresTespitModalProps {
 
 type Phase = 'intro' | 1 | 2 | 3 | 4;
 
-const STEPS = [
-  { id: 1, label: 'Privacy' },
-  { id: 2, label: 'Application type' },
-  { id: 3, label: 'User details' },
-  { id: 4, label: 'Documents' },
-] as const;
-
 const DISTRICT_OPTIONS = ['Tevragh Zeina', 'Ksar', 'Dar Naim', 'Teyaret'];
-const TYPE_OPTIONS = ['New address detection', 'Address correction', 'Detection for official document'];
-const FORM_OPTIONS = ['Individual', 'Corporate', 'Via proxy'];
+const TYPE_VALUES = ['New address detection', 'Address correction', 'Detection for official document'] as const;
+const FORM_VALUES = ['Individual', 'Corporate', 'Via proxy'] as const;
 
 const headerBtnStyle: CSSProperties = {
   width: 28,
@@ -83,9 +78,16 @@ function UploadIcon() {
 }
 
 function Stepper({ active }: { active: number }) {
+  const { m } = useI18n();
+  const steps = [
+    { id: 1, label: m.detect.privacy },
+    { id: 2, label: m.detect.appType },
+    { id: 3, label: m.detect.userDetails },
+    { id: 4, label: m.detect.documents },
+  ];
   return (
     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, padding: '8px 4px 4px' }}>
-      {STEPS.map((step, i) => {
+      {steps.map((step, i) => {
         const done = active > step.id;
         const current = active === step.id;
         const tone = done || current ? 'var(--surface-accent)' : 'var(--gray-300)';
@@ -163,12 +165,13 @@ function UploadZone({
   fileName: string | null;
   onPick: (name: string) => void;
 }) {
+  const { m } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.1fr)', gap: 14, alignItems: 'center' }}>
       <div>
         <div style={{ fontSize: 13, color: 'var(--text-body)', lineHeight: 1.4 }}>• {label}</div>
-        {optional && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Optional</div>}
+        {optional && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>{m.common.optional}</div>}
       </div>
       <button
         type="button"
@@ -188,9 +191,9 @@ function UploadZone({
       >
         <UploadIcon />
         <div style={{ fontSize: 12, color: 'var(--text-heading)', fontWeight: 600 }}>
-          {fileName || 'Click to upload or drag and drop'}
+          {fileName || m.detect.upload}
         </div>
-        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Accepted formats: {formats}</div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{m.detect.accepted(formats)}</div>
         <input
           ref={inputRef}
           type="file"
@@ -219,10 +222,11 @@ function ModalShell({
   children: ReactNode;
   footer?: ReactNode;
 }) {
+  const { m } = useI18n();
   return (
     <div
       role="dialog"
-      aria-label="Address Detection Application"
+      aria-label={m.detect.title}
       style={{
         width: minimized ? 360 : 760,
         maxWidth: 'calc(100vw - 24px)',
@@ -252,14 +256,14 @@ function ModalShell({
           fontWeight: 'var(--weight-semibold)',
           color: 'var(--text-on-accent)',
         }}>
-          Address Detection Application
+          {m.detect.title}
         </h2>
-        <button type="button" title={minimized ? 'Restore' : 'Minimize'} aria-label={minimized ? 'Restore' : 'Minimize'} onClick={onMinimize} style={headerBtnStyle}>
+        <button type="button" title={minimized ? m.common.restore : m.common.minimize} aria-label={minimized ? m.common.restore : m.common.minimize} onClick={onMinimize} style={headerBtnStyle}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
             <path d="M5 12h14" />
           </svg>
         </button>
-        <button type="button" title="Close" aria-label="Close" onClick={onClose} style={headerBtnStyle}>
+        <button type="button" title={m.common.close} aria-label={m.common.close} onClick={onClose} style={headerBtnStyle}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
             <path d="M5 5l14 14M19 5L5 19" />
           </svg>
@@ -278,15 +282,16 @@ function ModalShell({
 }
 
 function WizardHeader() {
+  const { m } = useI18n();
   return (
     <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', marginBottom: 16 }}>
       <PinIcon />
       <div>
         <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-heading)', marginBottom: 4 }}>
-          Address Detection Application
+          {m.detect.title}
         </div>
         <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.45 }}>
-          Complete your application easily by filling in the required information step by step for your address detection process.
+          {m.detect.wizardLead}
         </div>
       </div>
     </div>
@@ -294,11 +299,12 @@ function WizardHeader() {
 }
 
 export function AdresTespitButton({ onClick }: { onClick: () => void }) {
+  const { m } = useI18n();
   return (
     <button
       type="button"
       onClick={onClick}
-      aria-label="Address Detection"
+      aria-label={m.nav.addressDetection}
       style={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -319,12 +325,13 @@ export function AdresTespitButton({ onClick }: { onClick: () => void }) {
       }}
     >
       <DocPenIcon />
-      ADDRESS DETECTION
+      {m.nav.addressDetectionButton}
     </button>
   );
 }
 
 export function AdresTespitModal({ onClose }: AdresTespitModalProps) {
+  const { m } = useI18n();
   const [minimized, setMinimized] = useState(false);
   const [phase, setPhase] = useState<Phase>('intro');
   const [introOk, setIntroOk] = useState(false);
@@ -359,12 +366,12 @@ export function AdresTespitModal({ onClose }: AdresTespitModalProps) {
       <ModalShell minimized={minimized} onMinimize={() => setMinimized((m) => !m)} onClose={onClose} footer={footerBar(
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--text-body)', cursor: 'pointer' }}>
           <input type="checkbox" checked={introOk} onChange={(e) => setIntroOk(e.target.checked)} />
-          I have read and understood
+          {m.detect.readUnderstood}
         </label>,
-        <Button variant="primary" disabled={!introOk} onClick={() => introOk && setPhase(1)}>Continue</Button>,
+        <Button variant="primary" disabled={!introOk} onClick={() => introOk && setPhase(1)}>{m.common.continue}</Button>,
       )}>
         <p style={{ margin: '0 0 14px', fontSize: 13, color: 'var(--text-body)', lineHeight: 1.5 }}>
-          To complete your application, please prepare the following documents electronically before you begin.
+          {m.detect.prepareDocs}
         </p>
         <div style={{
           border: '1px solid var(--cyan-300)',
@@ -373,9 +380,9 @@ export function AdresTespitModal({ onClose }: AdresTespitModalProps) {
           background: 'var(--surface-page)',
         }}>
           <BulletList items={[
-            'Lease agreement or title deed, utility bill (electricity, water, gas), insurance policy, or another document showing the address',
-            'Signature circular / power of attorney',
-            'Color photo of ID front and back',
+            m.detect.docLease,
+            m.detect.docProxy,
+            m.detect.docId,
           ]} />
         </div>
       </ModalShell>
@@ -390,13 +397,13 @@ export function AdresTespitModal({ onClose }: AdresTespitModalProps) {
       footer={
         phase === 4
           ? footerBar(
-            <Button variant="secondary" onClick={() => setPhase(3)}>Back</Button>,
+            <Button variant="secondary" onClick={() => setPhase(3)}>{m.common.back}</Button>,
             <Button variant="success" onClick={onClose}>
-              Send application for SMS approval
+              {m.detect.sendSms}
             </Button>,
           )
           : footerBar(
-            <Button variant="secondary" onClick={() => setPhase((phase === 1 ? 'intro' : (phase - 1)) as Phase)}>Back</Button>,
+            <Button variant="secondary" onClick={() => setPhase((phase === 1 ? 'intro' : (phase - 1)) as Phase)}>{m.common.back}</Button>,
             <Button
               variant="primary"
               disabled={phase === 1 && !privacyOk}
@@ -405,7 +412,7 @@ export function AdresTespitModal({ onClose }: AdresTespitModalProps) {
                 setPhase((phase + 1) as Phase);
               }}
             >
-              Next
+              {m.common.next}
             </Button>,
           )
       }
@@ -421,21 +428,21 @@ export function AdresTespitModal({ onClose }: AdresTespitModalProps) {
             padding: '14px 16px',
             background: 'var(--cyan-50, #f0fafd)',
           }}>
-            <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-heading)', marginBottom: 10 }}>Required documents</div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-heading)', marginBottom: 10 }}>{m.detect.requiredDocs}</div>
             <BulletList items={[
-              'Water, electricity, and gas subscription procedures',
-              'Business opening license procedures',
-              'Urban renewal (rent support), civil registry declaration procedures',
+              m.detect.reqWater,
+              m.detect.reqBusiness,
+              m.detect.reqUrban,
             ]} />
           </div>
           <label style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 13, color: 'var(--text-body)', lineHeight: 1.45, cursor: 'pointer' }}>
             <input type="checkbox" checked={privacyOk} onChange={(e) => setPrivacyOk(e.target.checked)} style={{ marginTop: 3 }} />
             <span>
-              I have read, understood, and agree to the{' '}
+              {m.detect.privacyAgreeBefore}{' '}
               <a href="#" onClick={(e) => e.preventDefault()} style={{ color: 'var(--red-600)', fontWeight: 700, textDecoration: 'none' }}>
-                Privacy Notice
+                {m.detect.privacyNotice}
               </a>
-              {' '}regarding the processing of my personal data.
+              {' '}{m.detect.privacyAgreeAfter}
             </span>
           </label>
         </div>
@@ -443,26 +450,26 @@ export function AdresTespitModal({ onClose }: AdresTespitModalProps) {
 
       {phase === 2 && (
         <div style={{ marginTop: 18, display: 'grid', gap: 14 }}>
-          <Select options={DISTRICT_OPTIONS} value={district} placeholder="Select district" onChange={(e) => setDistrict(e.target.value)} style={fieldStyle} />
-          <Select options={TYPE_OPTIONS} value={appType} placeholder="Select application type" onChange={(e) => setAppType(e.target.value)} style={fieldStyle} />
-          <Select options={FORM_OPTIONS} value={appForm} placeholder="Select application form" onChange={(e) => setAppForm(e.target.value)} style={fieldStyle} />
+          <Select options={DISTRICT_OPTIONS} value={district} placeholder={m.detect.selectDistrict} onChange={(e) => setDistrict(e.target.value)} style={fieldStyle} />
+          <Select options={catalogOptions(m.catalog, TYPE_VALUES)} value={appType} placeholder={m.detect.selectType} onChange={(e) => setAppType(e.target.value)} style={fieldStyle} />
+          <Select options={catalogOptions(m.catalog, FORM_VALUES)} value={appForm} placeholder={m.detect.selectForm} onChange={(e) => setAppForm(e.target.value)} style={fieldStyle} />
         </div>
       )}
 
       {phase === 3 && (
         <div style={{ marginTop: 18, display: 'grid', gap: 14 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 10, alignItems: 'end' }}>
-            <Input placeholder="ID" value={idValue} onChange={(e) => setIdValue(e.target.value)} aria-label="ID" style={fieldStyle} />
-            <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} aria-label="Date of birth" style={fieldStyle} />
+            <Input placeholder={m.detect.id} value={idValue} onChange={(e) => setIdValue(e.target.value)} aria-label={m.detect.id} style={fieldStyle} />
+            <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} aria-label={m.detect.birthDate} style={fieldStyle} />
             <Button
               variant="primary"
               onClick={() => setFullName('Mohamed Fall')}
               style={{ height: 42, whiteSpace: 'nowrap' }}
             >
-              Verify person
+              {m.detect.verifyPerson}
             </Button>
           </div>
-          <Input placeholder="Enter full name" value={fullName} onChange={(e) => setFullName(e.target.value)} aria-label="Full name" style={fieldStyle} />
+          <Input placeholder={m.detect.enterFullName} value={fullName} onChange={(e) => setFullName(e.target.value)} aria-label={m.demand.fullName} style={fieldStyle} />
           <div style={{ display: 'grid', gridTemplateColumns: '72px 1fr', gap: 8 }}>
             <div style={{
               height: 42,
@@ -478,7 +485,7 @@ export function AdresTespitModal({ onClose }: AdresTespitModalProps) {
             }}>
               +222
             </div>
-            <Input placeholder="Phone number" value={phone} onChange={(e) => setPhone(e.target.value)} aria-label="Phone number" style={fieldStyle} />
+            <Input placeholder={m.detect.phone} value={phone} onChange={(e) => setPhone(e.target.value)} aria-label={m.detect.phone} style={fieldStyle} />
           </div>
         </div>
       )}
@@ -486,20 +493,20 @@ export function AdresTespitModal({ onClose }: AdresTespitModalProps) {
       {phase === 4 && (
         <div style={{ marginTop: 18, display: 'grid', gap: 18 }}>
           <UploadZone
-            label="Lease agreement, title deed, utility bill (electricity, water, gas, insurance), or another document showing the address"
+            label={m.detect.docLeaseLong}
             formats=".png, .jpeg, .jpg, .pdf"
             fileName={fileAddress}
             onPick={setFileAddress}
           />
           <UploadZone
-            label="Signature circular / power of attorney"
+            label={m.detect.docProxy}
             optional
             formats=".png, .jpeg, .jpg, .pdf, .doc, .docx"
             fileName={fileProxy}
             onPick={setFileProxy}
           />
           <UploadZone
-            label="ID front and back (color)"
+            label={m.catalog.idColor}
             formats=".png, .jpeg, .jpg, .pdf"
             fileName={fileId}
             onPick={setFileId}

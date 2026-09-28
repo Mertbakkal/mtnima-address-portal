@@ -1,4 +1,5 @@
 import { useState, type CSSProperties, type ReactNode } from 'react';
+import { useI18n } from '../../i18n/LocaleProvider';
 
 export interface AttributePanelProps {
   title?: ReactNode;
@@ -13,8 +14,10 @@ export interface AttributePanelProps {
 }
 
 export function AttributePanel({
-  title, icon, onClose, children, footer, tabs, width = 'var(--panel-width)', closeLabel = 'Close', style,
+  title, icon, onClose, children, footer, tabs, width = 'var(--panel-width)', closeLabel, style,
 }: AttributePanelProps) {
+  const { m } = useI18n();
+  const resolvedClose = closeLabel ?? m.common.close;
   const [hover, setHover] = useState(false);
   return (
     <aside aria-label={typeof title === 'string' ? title : undefined} style={{
@@ -33,7 +36,7 @@ export function AttributePanel({
           color: 'var(--text-heading)', lineHeight: 'var(--leading-snug)',
         }}>{title}</h2>
         {onClose ? (
-          <button type="button" onClick={onClose} title={closeLabel} aria-label={closeLabel}
+          <button type="button" onClick={onClose} title={resolvedClose} aria-label={resolvedClose}
             onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
             style={{
               width: '28px', height: '28px', flex: '0 0 auto', display: 'flex',

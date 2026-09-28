@@ -9,6 +9,7 @@ import {
   resolveGeocode,
   type GeocodeResult,
 } from '../data/geocodeSearch';
+import { useI18n } from '../i18n/LocaleProvider';
 
 export interface SearchGeocodeModalProps {
   onClose: () => void;
@@ -34,19 +35,21 @@ function GlobeSearchIcon({ size = 18 }: { size?: number }) {
 }
 
 export function SearchGeocodeButton({ onClick }: { onClick: () => void }) {
+  const { m } = useI18n();
   return (
     <IconButton
       shape="round"
       tone="solid"
       icon={<GlobeSearchIcon size={18} />}
-      label="Search Geocode"
+      label={m.rail.searchGeocode}
       onClick={onClick}
-      style={{ width: 40, height: 40 }}
+      style={{ width: 'var(--maptool-button-size)', height: 'var(--maptool-button-size)' }}
     />
   );
 }
 
 export function SearchGeocodeModal({ onClose, onSearch }: SearchGeocodeModalProps) {
+  const { m } = useI18n();
   const [grid, setGrid] = useState(DEFAULT_BASE_GRID);
   const [abscissa, setAbscissa] = useState('');
   const [ordinate, setOrdinate] = useState('');
@@ -88,7 +91,7 @@ export function SearchGeocodeModal({ onClose, onSearch }: SearchGeocodeModalProp
   return (
     <div
       role="dialog"
-      aria-label="Search Geocode"
+      aria-label={m.geocode.title}
       style={{
         width: 320,
         maxWidth: 'calc(100vw - 24px)',
@@ -119,9 +122,9 @@ export function SearchGeocodeModal({ onClose, onSearch }: SearchGeocodeModalProp
           color: 'var(--text-on-accent)',
           textAlign: 'center',
         }}>
-          Search Geocode
+          {m.geocode.title}
         </h2>
-        <button type="button" title="Close" aria-label="Close" onClick={onClose} style={headerBtn}>
+        <button type="button" title={m.common.close} aria-label={m.common.close} onClick={onClose} style={headerBtn}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
             <path d="M5 5l14 14M19 5L5 19" />
           </svg>
@@ -130,38 +133,38 @@ export function SearchGeocodeModal({ onClose, onSearch }: SearchGeocodeModalProp
 
       <div style={{ padding: '20px 22px 22px', display: 'flex', flexDirection: 'column', gap: 18 }}>
         <div>
-          <label style={fieldLabel}>Base Grid</label>
+          <label style={fieldLabel}>{m.geocode.baseGrid}</label>
           <Select
             options={getBaseGridOptions()}
             value={grid}
             onChange={(e) => setGrid(e.target.value)}
-            aria-label="Base Grid"
+            aria-label={m.geocode.baseGrid}
           />
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div>
-            <label style={{ ...fieldLabel, textAlign: 'left' }}>Abscissa :</label>
+            <label style={{ ...fieldLabel, textAlign: 'left' }}>{m.geocode.abscissa}</label>
             <Input
               mono
               value={abscissa}
               placeholder="XXX"
               maxLength={3}
               inputMode="numeric"
-              aria-label="Abscissa"
+              aria-label={m.geocode.abscissa}
               onChange={(e) => setAbscissa(digitsOnly3(e.target.value))}
               style={{ textAlign: 'center', letterSpacing: '0.12em' }}
             />
           </div>
           <div>
-            <label style={{ ...fieldLabel, textAlign: 'left' }}>Ordinate :</label>
+            <label style={{ ...fieldLabel, textAlign: 'left' }}>{m.geocode.ordinate}</label>
             <Input
               mono
               value={ordinate}
               placeholder="YYY"
               maxLength={3}
               inputMode="numeric"
-              aria-label="Ordinate"
+              aria-label={m.geocode.ordinate}
               onChange={(e) => setOrdinate(digitsOnly3(e.target.value))}
               style={{ textAlign: 'center', letterSpacing: '0.12em' }}
             />
@@ -175,7 +178,7 @@ export function SearchGeocodeModal({ onClose, onSearch }: SearchGeocodeModalProp
           onClick={handleSearch}
           style={{ width: '100%' }}
         >
-          Search
+          {m.common.search}
         </Button>
       </div>
     </div>

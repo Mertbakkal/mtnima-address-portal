@@ -18,6 +18,8 @@ import {
   type TaskUser,
 } from '../data/taskMissionWizard';
 import type { TaskMission } from '../data/taskMissions';
+import { useI18n } from '../i18n/LocaleProvider';
+import { catalogLabel } from '../i18n/messages';
 
 export type DutyPlaceMode = 'hierarchical' | 'polygon';
 
@@ -79,6 +81,7 @@ function StepIcon({ kind, active }: { kind: string; active: boolean }) {
 }
 
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
+  const { m } = useI18n();
   return (
     <span
       style={{
@@ -97,7 +100,7 @@ function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
       {label}
       <button
         type="button"
-        aria-label={`Remove ${label}`}
+        aria-label={m.common.remove(label)}
         onClick={onRemove}
         style={{
           border: 'none',
@@ -125,6 +128,7 @@ export function TaskDetailsWizard({
   dutyPolygon,
   onClearPolygon,
 }: TaskDetailsWizardProps) {
+  const { m } = useI18n();
   const [step, setStep] = useState(0);
   const [taskName, setTaskName] = useState(mission?.name ?? '');
   const [dutyMode, setDutyMode] = useState<DutyPlaceMode>('hierarchical');
@@ -136,7 +140,9 @@ export function TaskDetailsWizard({
   const [userQuery, setUserQuery] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<TaskUser[]>([]);
 
-  const badge = taskName.trim() || (isNew ? 'New mission' : mission?.name || 'Mission');
+  const badge = taskName.trim() || (isNew ? m.tasks.newMissionBadge : mission?.name || m.tasks.mission);
+  const stepLabels = [m.tasks.stepMission, m.tasks.stepDuty, m.tasks.stepColumns, m.tasks.stepUsers];
+  const tableTitle = (id: string) => (id === 'road' ? m.tasks.tableRoad : m.tasks.tablePoint);
 
   const setDuty = (mode: DutyPlaceMode) => {
     setDutyMode(mode);
@@ -166,15 +172,21 @@ export function TaskDetailsWizard({
   const filteredTables = useMemo(() => {
     const tq = tableQuery.trim().toLowerCase();
     const cq = colQuery.trim().toLowerCase();
-    return WIZARD_TABLES.map((t) => ({
-      ...t,
-      columns: t.columns.filter((c) => {
-        if (tq && !t.label.toLowerCase().includes(tq) && !t.id.includes(tq)) return false;
-        if (cq && !c.name.toLowerCase().includes(cq)) return false;
-        return true;
-      }),
-    })).filter((t) => !tq || t.label.toLowerCase().includes(tq) || t.id.includes(tq) || t.columns.length > 0);
-  }, [tableQuery, colQuery]);
+    return WIZARD_TABLES.map((t) => {
+      const label = (t.id === 'road' ? m.tasks.tableRoad : m.tasks.tablePoint).toLowerCase();
+      return {
+        ...t,
+        columns: t.columns.filter((c) => {
+          if (tq && !label.includes(tq) && !t.id.includes(tq) && !t.label.toLowerCase().includes(tq)) return false;
+          if (cq && !c.name.toLowerCase().includes(cq)) return false;
+          return true;
+        }),
+      };
+    }).filter((t) => {
+      const label = (t.id === 'road' ? m.tasks.tableRoad : m.tasks.tablePoint).toLowerCase();
+      return !tq || label.includes(tq) || t.id.includes(tq) || t.label.toLowerCase().includes(tq) || t.columns.length > 0;
+    });
+  }, [tableQuery, colQuery, m]);
 
   const filteredUsers = useMemo(() => {
     const q = userQuery.trim().toLowerCase();
@@ -217,19 +229,19 @@ export function TaskDetailsWizard({
   if (step === 0) {
     body = (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <h4 style={sectionTitle}>Mission Information</h4>
+        <h4 style={sectionTitle}>{m.tasks.missionInfo}</h4>
         <label style={fieldLabel}>
-          Task Name/Description <span style={{ color: 'var(--red-500)' }}>*</span>
+          {m.tasks.taskName} <span style={{ color: 'var(--red-500)' }}>*</span>
         </label>
         <Textarea
           rows={4}
           maxLength={500}
           value={taskName}
           onChange={(e) => setTaskName(e.target.value.slice(0, 500))}
-          placeholder="Enter a task name or short description"
+          placeholder={m.tasks.taskPlaceholder}
         />
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 12, color: 'var(--gray-600)' }}>
-          <span>The task name or a short description can be entered.</span>
+          <span>{m.tasks.taskHint}</span>
           <span style={{ fontFamily: 'var(--font-mono)' }}>{taskName.length}/500</span>
         </div>
       </div>
@@ -237,10 +249,10 @@ export function TaskDetailsWizard({
   } else if (step === 1) {
     body = (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <h4 style={sectionTitle}>Selection of Duty Place</h4>
+        <h4 style={sectionTitle}>{m.tasks.dutyTitle}</h4>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
           <span style={{ fontSize: 13, fontWeight: 600, color: dutyMode === 'hierarchical' ? 'var(--text-accent)' : 'var(--gray-500)' }}>
-            Hierarchical Selection
+            {m.tasks.hierarchical}
           </span>
           <Switch
             checked={dutyMode === 'polygon'}
@@ -248,50 +260,50 @@ export function TaskDetailsWizard({
             id="duty-place-mode"
           />
           <span style={{ fontSize: 13, fontWeight: 600, color: dutyMode === 'polygon' ? 'var(--text-accent)' : 'var(--gray-500)' }}>
-            Polygon Drawing
+            {m.tasks.polygon}
           </span>
         </div>
 
         {dutyMode === 'hierarchical' ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <Select
-              aria-label="Wilaya"
+              aria-label={m.address.wilaya}
               value={hier.wilaya || ''}
               onChange={(e) => setHierLevel('wilaya', e.target.value)}
               options={wilayas}
-              placeholder="Select wilaya..."
+              placeholder={m.tasks.selectWilaya}
             />
             <Select
-              aria-label="Moughataa"
+              aria-label={m.address.moughataa}
               value={hier.moughataa || ''}
               onChange={(e) => setHierLevel('moughataa', e.target.value)}
               options={moughataas}
-              placeholder="Select moughataa..."
+              placeholder={m.tasks.selectMoughataa}
               disabled={!hier.wilaya}
             />
             <Select
-              aria-label="Commune"
+              aria-label={m.address.commune}
               value={hier.commune || ''}
               onChange={(e) => setHierLevel('commune', e.target.value)}
               options={communes}
-              placeholder="Select commune..."
+              placeholder={m.tasks.selectCommune}
               disabled={!hier.moughataa}
             />
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <p style={{ margin: 0, fontSize: 13, color: 'var(--gray-600)', lineHeight: 1.4 }}>
-              Click on the map to add polygon vertices. Double-click to finish. Only features inside the polygon stay highlighted.
+              {m.tasks.polygonHelp}
             </p>
             {dutyPolygon && dutyPolygon.length >= 3 ? (
               <div style={{ fontSize: 12, color: 'var(--navy-700)' }}>
-                Polygon set ({dutyPolygon.length} vertices)
+                {m.tasks.polygonSet(dutyPolygon.length)}
               </div>
             ) : (
-              <div style={{ fontSize: 12, color: 'var(--amber-700)' }}>Drawing… click the map behind this panel.</div>
+              <div style={{ fontSize: 12, color: 'var(--amber-700)' }}>{m.tasks.drawing}</div>
             )}
             <Button variant="secondary" size="sm" onClick={onClearPolygon} disabled={!dutyPolygon}>
-              Clear polygon
+              {m.tasks.clearPolygon}
             </Button>
           </div>
         )}
@@ -301,24 +313,24 @@ export function TaskDetailsWizard({
     body = (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minHeight: 0, flex: 1 }}>
         <div>
-          <h4 style={{ ...sectionTitle, marginBottom: 4 }}>Table and Column Selection</h4>
+          <h4 style={{ ...sectionTitle, marginBottom: 4 }}>{m.tasks.columnsTitle}</h4>
           <p style={{ margin: 0, fontSize: 12, color: 'var(--gray-600)' }}>
-            Select columns from Road (yol) and Point tables. ({selectedCols.length} column selected)
+            {m.tasks.columnsHelp(selectedCols.length)}
           </p>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <Input
             value={tableQuery}
             onChange={(e) => setTableQuery(e.target.value)}
-            placeholder="Table Name..."
-            aria-label="Filter tables"
+            placeholder={m.tasks.tableName}
+            aria-label={m.tasks.filterTables}
             style={{ flex: 1, minWidth: 120 }}
           />
           <Input
             value={colQuery}
             onChange={(e) => setColQuery(e.target.value)}
-            placeholder="Column Name..."
-            aria-label="Filter columns"
+            placeholder={m.tasks.columnName}
+            aria-label={m.tasks.filterColumns}
             style={{ flex: 1, minWidth: 120 }}
           />
         </div>
@@ -347,9 +359,9 @@ export function TaskDetailsWizard({
                   }}
                 >
                   <span style={{ transform: open ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }}>›</span>
-                  {table.label}
+                  {tableTitle(table.id)}
                   <span style={{ marginLeft: 'auto', fontWeight: 500, color: 'var(--gray-500)', fontSize: 11 }}>
-                    {table.columns.length} columns
+                    {m.tasks.columnsCount(table.columns.length)}
                   </span>
                 </button>
                 {open && (
@@ -372,7 +384,7 @@ export function TaskDetailsWizard({
                         >
                           <input type="checkbox" checked={checked} onChange={() => toggleCol(table.id, col.id)} />
                           <span style={{ fontFamily: 'var(--font-mono)' }}>{col.name}</span>
-                          <span style={{ color: 'var(--gray-500)' }}>({col.type})</span>
+                          <span style={{ color: 'var(--gray-500)' }}>({catalogLabel(m.catalog, col.type)})</span>
                         </label>
                       );
                     })}
@@ -384,14 +396,14 @@ export function TaskDetailsWizard({
         </div>
         <div>
           <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6, color: 'var(--text-heading)' }}>
-            Selected Columns ({selectedCols.length}):
+            {m.tasks.selectedColumns(selectedCols.length)}
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, minHeight: 28 }}>
             {selectedCols.map((key) => {
               const [tableId, colId] = key.split('.');
               const table = WIZARD_TABLES.find((t) => t.id === tableId);
               const col = table?.columns.find((c) => c.id === colId);
-              const label = `${tableId}.${colId} (${col?.type ?? '?'})`;
+              const label = `${tableId}.${colId} (${col ? catalogLabel(m.catalog, col.type) : '?'})`;
               return <Chip key={key} label={label} onRemove={() => setSelectedCols((p) => p.filter((k) => k !== key))} />;
             })}
           </div>
@@ -401,14 +413,14 @@ export function TaskDetailsWizard({
   } else {
     body = (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minHeight: 0, flex: 1 }}>
-        <h4 style={sectionTitle}>User Choice</h4>
+        <h4 style={sectionTitle}>{m.tasks.userChoice}</h4>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
-          <Button variant="secondary" size="sm" onClick={() => setUserQuery('')}>Clear</Button>
+          <Button variant="secondary" size="sm" onClick={() => setUserQuery('')}>{m.common.clear}</Button>
           <Input
             value={userQuery}
             onChange={(e) => setUserQuery(e.target.value)}
-            placeholder="Search"
-            aria-label="Search users"
+            placeholder={m.common.search}
+            aria-label={m.tasks.searchUsers}
             style={{ flex: 1, minWidth: 140 }}
           />
         </div>
@@ -416,7 +428,7 @@ export function TaskDetailsWizard({
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, fontFamily: 'var(--font-ui)' }}>
             <thead>
               <tr style={{ background: 'var(--gray-100)' }}>
-                {['Name', 'Surname', 'E-mail'].map((h) => (
+                {[m.tasks.name, m.tasks.surname, m.tasks.email].map((h) => (
                   <th key={h} style={{ padding: '8px 10px', textAlign: 'left', borderBottom: '1px solid var(--border-panel)', color: 'var(--text-heading)' }}>
                     {h}
                   </th>
@@ -426,7 +438,7 @@ export function TaskDetailsWizard({
             <tbody>
               {filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={3} style={{ padding: 16, textAlign: 'center', color: 'var(--gray-500)' }}>No Data Found</td>
+                  <td colSpan={3} style={{ padding: 16, textAlign: 'center', color: 'var(--gray-500)' }}>{m.tasks.noData}</td>
                 </tr>
               ) : (
                 filteredUsers.map((u, i) => {
@@ -451,7 +463,7 @@ export function TaskDetailsWizard({
           </table>
         </div>
         <div>
-          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Selected Users ({selectedUsers.length}):</div>
+          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>{m.tasks.selectedUsers(selectedUsers.length)}</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, minHeight: 28 }}>
             {selectedUsers.map((u) => (
               <Chip
@@ -468,7 +480,7 @@ export function TaskDetailsWizard({
 
   return (
     <aside
-      aria-label="Task Details"
+      aria-label={m.tasks.details}
       style={{
         width: 420,
         maxWidth: '100%',
@@ -490,7 +502,7 @@ export function TaskDetailsWizard({
         }}
       >
         <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: 'var(--text-heading)', fontFamily: 'var(--font-ui)' }}>
-          Task Details
+          {m.tasks.details}
         </h3>
         <span
           style={{
@@ -511,8 +523,8 @@ export function TaskDetailsWizard({
         </span>
         <button
           type="button"
-          title="Close details"
-          aria-label="Close details"
+          title={m.tasks.closeDetails}
+          aria-label={m.tasks.closeDetails}
           onClick={onClose}
           style={{
             marginLeft: 'auto',
@@ -571,7 +583,7 @@ export function TaskDetailsWizard({
                   fontWeight: active ? 700 : 500,
                 }}
               >
-                {s.label}
+                {stepLabels[i]}
               </span>
             </div>
           );
@@ -595,18 +607,18 @@ export function TaskDetailsWizard({
       >
         {step > 0 ? (
           <Button variant="secondary" size="sm" onClick={goBack}>
-            ← Back
+            {m.tasks.back}
           </Button>
         ) : (
           <span />
         )}
         {step < 3 ? (
           <Button size="sm" onClick={goNext} disabled={!canNext}>
-            Next →
+            {m.tasks.nextStep}
           </Button>
         ) : (
           <Button variant="success" size="sm" onClick={handleSave} disabled={!taskName.trim()}>
-            Save
+            {m.common.save}
           </Button>
         )}
       </div>

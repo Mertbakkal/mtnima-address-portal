@@ -11,6 +11,7 @@ import {
   type HierarchySelection,
   type MapFocus,
 } from '../data/hierarchySearch';
+import { useI18n } from '../i18n/LocaleProvider';
 
 export interface HierarchicalAddressSearchModalProps {
   onClose: () => void;
@@ -25,6 +26,7 @@ const EMPTY: HierarchySelection = {
 };
 
 export function HierarchicalAddressSearchModal({ onClose, onShow }: HierarchicalAddressSearchModalProps) {
+  const { m } = useI18n();
   const [selection, setSelection] = useState<HierarchySelection>(EMPTY);
   const [minimized, setMinimized] = useState(false);
 
@@ -58,7 +60,7 @@ export function HierarchicalAddressSearchModal({ onClose, onShow }: Hierarchical
   return (
     <div
       role="dialog"
-      aria-label="Hierarchical Address Search"
+      aria-label={m.hierarchy.title}
       style={{
         width: minimized ? 320 : 360,
         maxWidth: 'calc(100vw - 24px)',
@@ -92,12 +94,12 @@ export function HierarchicalAddressSearchModal({ onClose, onShow }: Hierarchical
             color: 'var(--text-on-accent)',
           }}
         >
-          Hierarchical Address Search
+          {m.hierarchy.title}
         </h2>
         <button
           type="button"
-          title={minimized ? 'Restore' : 'Minimize'}
-          aria-label={minimized ? 'Restore' : 'Minimize'}
+          title={minimized ? m.common.restore : m.common.minimize}
+          aria-label={minimized ? m.common.restore : m.common.minimize}
           onClick={() => setMinimized((m) => !m)}
           style={{
             width: 28,
@@ -120,8 +122,8 @@ export function HierarchicalAddressSearchModal({ onClose, onShow }: Hierarchical
         </button>
         <button
           type="button"
-          title="Close"
-          aria-label="Close"
+          title={m.common.close}
+          aria-label={m.common.close}
           onClick={onClose}
           style={{
             width: 28,
@@ -147,37 +149,37 @@ export function HierarchicalAddressSearchModal({ onClose, onShow }: Hierarchical
       {!minimized && (
         <>
           <div style={{ padding: 'var(--space-5) var(--space-7) var(--space-4)' }}>
-            <FormRow label="Wilaya" layout="stacked" colon={false}>
+            <FormRow label={m.address.wilaya} layout="stacked" colon={false}>
               <Select
                 options={wilayas}
                 value={selection.wilaya || ''}
-                placeholder="Select a wilaya"
+                placeholder={m.hierarchy.selectWilaya}
                 onChange={(e) => setLevel('wilaya', e.target.value)}
               />
             </FormRow>
-            <FormRow label="Moughataa" layout="stacked" colon={false}>
+            <FormRow label={m.address.moughataa} layout="stacked" colon={false}>
               <Select
                 options={moughataas}
                 value={selection.moughataa || ''}
-                placeholder="Select a moughataa"
+                placeholder={m.hierarchy.selectMoughataa}
                 disabled={!selection.wilaya}
                 onChange={(e) => setLevel('moughataa', e.target.value)}
               />
             </FormRow>
-            <FormRow label="Commune" layout="stacked" colon={false}>
+            <FormRow label={m.address.commune} layout="stacked" colon={false}>
               <Select
                 options={communes}
                 value={selection.commune || ''}
-                placeholder="Select a commune"
+                placeholder={m.hierarchy.selectCommune}
                 disabled={!selection.moughataa}
                 onChange={(e) => setLevel('commune', e.target.value)}
               />
             </FormRow>
-            <FormRow label="Street" layout="stacked" colon={false}>
+            <FormRow label={m.address.street} layout="stacked" colon={false}>
               <Select
                 options={streets}
                 value={selection.street || ''}
-                placeholder="Select a street"
+                placeholder={m.hierarchy.selectStreet}
                 disabled={!selection.commune}
                 onChange={(e) => setLevel('street', e.target.value)}
               />
@@ -194,10 +196,10 @@ export function HierarchicalAddressSearchModal({ onClose, onShow }: Hierarchical
             }}
           >
             <Button variant="primary" onClick={handleShow} disabled={!canShow}>
-              Show
+              {m.common.show}
             </Button>
             <Button variant="secondary" onClick={handleReset}>
-              Reset
+              {m.common.reset}
             </Button>
           </div>
         </>

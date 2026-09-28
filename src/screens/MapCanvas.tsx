@@ -7,6 +7,8 @@ import { AddressMarker } from '../components/map/AddressMarker';
 import { Icon } from '../components/core/Icon';
 import { IconButton } from '../components/core/IconButton';
 import { SearchGeocodeButton } from './SearchGeocodeModal';
+import { LanguageMenu } from '../components/navigation/LanguageMenu';
+import { useI18n } from '../i18n/LocaleProvider';
 import {
   CELL_SIZE_DEG,
   getCellAt,
@@ -20,16 +22,16 @@ import { buildRoadAddresses, type RoadAddress } from '../data/roadAddresses';
 import type { ToolId } from './AppShell';
 
 const RAIL_TOOL_DEFS = [
-  { id: 'star', iconName: 'rail-star', label: 'Favorites' },
-  { id: 'info', iconName: 'rail-info', label: 'Info' },
-  { id: 'pan', iconName: 'rail-pan', label: 'Pan' },
-  { id: 'clear', iconName: 'rail-clear', label: 'Clear' },
-  { id: 'satellite', iconName: 'rail-satellite', label: 'Satellite' },
-  { id: 'locate', iconName: 'rail-locate', label: 'Locate' },
-  { id: 'extent', iconName: 'rail-extent', label: 'Extent' },
-  { id: 'measure', iconName: 'rail-measure', label: 'Measure' },
-  { id: 'cloud', iconName: 'rail-cloud', label: 'Cloud' },
-  { id: 'target', iconName: 'rail-target', label: 'Target' },
+  { id: 'star', iconName: 'rail-star', labelKey: 'favorites' },
+  { id: 'info', iconName: 'rail-info', labelKey: 'info' },
+  { id: 'pan', iconName: 'rail-pan', labelKey: 'pan' },
+  { id: 'clear', iconName: 'rail-clear', labelKey: 'clear' },
+  { id: 'satellite', iconName: 'rail-satellite', labelKey: 'satellite' },
+  { id: 'locate', iconName: 'rail-locate', labelKey: 'locate' },
+  { id: 'extent', iconName: 'rail-extent', labelKey: 'extent' },
+  { id: 'measure', iconName: 'rail-measure', labelKey: 'measure' },
+  { id: 'cloud', iconName: 'rail-cloud', labelKey: 'cloud' },
+  { id: 'target', iconName: 'rail-target', labelKey: 'target' },
 ] as const;
 
 /** Country overview center (Mauritania). */
@@ -88,6 +90,7 @@ export function MapCanvas({
   focusRequest, placeRequest, onGeocodeClick,
   polygonDrawActive = false, dutyPolygon = null, onPolygonComplete,
 }: MapCanvasProps) {
+  const { m } = useI18n();
   const host = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const drawLayer = useRef<L.LayerGroup | null>(null);
@@ -405,7 +408,11 @@ export function MapCanvas({
     return { left: q.x, top: q.y };
   };
 
-  const railTools = RAIL_TOOL_DEFS.map((t) => ({ ...t, icon: <Icon name={t.iconName} size={20} /> }));
+  const railTools = RAIL_TOOL_DEFS.map((t) => ({
+    id: t.id,
+    label: m.rail[t.labelKey],
+    icon: <Icon name={t.iconName} size={20} />,
+  }));
   const draftPx = mapRef.current ? draft.map((ll) => mapRef.current!.latLngToContainerPoint(ll)) : [];
   const polyDraftPx = mapRef.current ? polyDraft.map((ll) => mapRef.current!.latLngToContainerPoint(ll)) : [];
 
@@ -443,7 +450,7 @@ export function MapCanvas({
           if (filterActive && !inside) return null;
           const q = pt(p);
           return (
-            <div key={p.id} role="button" tabIndex={0} aria-label={'Address point ' + p.number}
+            <div key={p.id} role="button" tabIndex={0} aria-label={m.rail.addressPoint(p.number)}
               onClick={() => handleMarkerActivate(p.id)} onKeyDown={(e) => e.key === 'Enter' && handleMarkerActivate(p.id)}
               style={{ position: 'absolute', left: q.left, top: q.top, transform: 'translate(-50%,-100%)', cursor: polygonDrawActive ? 'crosshair' : 'pointer', pointerEvents: 'auto' }}>
               <AddressMarker number={p.number} tone={selectedPoint === p.id ? 'selected' : 'default'} />
@@ -454,26 +461,34 @@ export function MapCanvas({
       {drawing && (
         <div style={{ position: 'absolute', top: 12, left: '50%', transform: 'translateX(-50%)', zIndex: 650, background: 'var(--navy-800)', color: '#fff', fontSize: 12, fontWeight: 600, padding: '7px 14px', borderRadius: 'var(--radius-pill)', boxShadow: 'var(--shadow-md)', whiteSpace: 'nowrap' }}>
           {polygonDrawActive
-            ? 'Click on the map to add polygon vertices — double-click to finish'
+            ? m.rail.drawPolygon
             : tool === 'draw'
-              ? 'Click on the map to add vertices — double-click to finish the street'
-              : 'Click on the map to place an address point'}
+              ? m.rail.drawStreet
+              : m.rail.drawPoint}
         </div>
       )}
-      <div style={{ position: 'absolute', left: 12, top: 12, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--space-3)', zIndex: 600 }}>
-        <MapToolRail tools={railTools} value={railTool} onChange={onRailTool} ariaLabel="Map tools" />
-        {onGeocodeClick ? (
-          <div style={{ paddingLeft: 'var(--space-5)' }}>
-            <SearchGeocodeButton onClick={onGeocodeClick} />
-          </div>
-        ) : null}
+      <div style={{
+        position: 'absolute', left: 12, top: 12, zIndex: 600,
+        width: 'var(--maptool-rail-width)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        gap: 'var(--space-3)', padding: 'var(--space-5) 0', paddingLeft: 'var(--space-5)',
+      }}>
+        <MapToolRail
+          tools={railTools}
+          value={railTool}
+          onChange={onRailTool}
+          ariaLabel={m.rail.mapTools}
+          style={{ width: 'auto', padding: 0, paddingLeft: 0, gap: 'var(--space-3)' }}
+        />
+        <LanguageMenu />
+        {onGeocodeClick ? <SearchGeocodeButton onClick={onGeocodeClick} /> : null}
       </div>
       <div style={{ position: 'absolute', right: 14, bottom: 26, zIndex: 600 }}>
         <MapZoomControl level={zoom}
           onZoomIn={() => mapRef.current?.zoomIn()}
           onZoomOut={() => mapRef.current?.zoomOut()}
-          levelLabel="Zoom level" zoomInLabel="Zoom in" zoomOutLabel="Zoom out"
-          extras={<IconButton shape="rail" icon={<Icon name="map-pin" size={20} />} label="My location"
+          levelLabel={m.rail.zoomLevel} zoomInLabel={m.rail.zoomIn} zoomOutLabel={m.rail.zoomOut}
+          extras={<IconButton shape="rail" icon={<Icon name="map-pin" size={20} />} label={m.rail.myLocation}
             onClick={() => mapRef.current?.setView(CENTER, OVERVIEW_ZOOM)} />} />
       </div>
     </div>

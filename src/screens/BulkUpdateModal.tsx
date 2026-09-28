@@ -11,6 +11,8 @@ import {
   BULK_WILAYA,
   type BulkUpdatePatch,
 } from '../data/dynamicQuery';
+import { useI18n } from '../i18n/LocaleProvider';
+import { catalogOptions } from '../i18n/messages';
 
 export interface BulkUpdateModalProps {
   onClose: () => void;
@@ -18,6 +20,7 @@ export interface BulkUpdateModalProps {
 }
 
 export function BulkUpdateModal({ onClose, onSave }: BulkUpdateModalProps) {
+  const { m } = useI18n();
   const [namingStatus, setNamingStatus] = useState('');
   const [buildingType, setBuildingType] = useState('');
   const [useType, setUseType] = useState('');
@@ -40,7 +43,7 @@ export function BulkUpdateModal({ onClose, onSave }: BulkUpdateModalProps) {
   return (
     <div
       role="dialog"
-      aria-label="Bulk Address Update"
+      aria-label={m.query.bulkTitle}
       style={{
         width: 340,
         maxWidth: 'calc(100vw - 32px)',
@@ -70,12 +73,12 @@ export function BulkUpdateModal({ onClose, onSave }: BulkUpdateModalProps) {
           lineHeight: 'var(--leading-snug)',
           color: 'var(--text-on-accent)',
         }}>
-          Bulk Address Update
+          {m.query.bulkTitle}
         </h2>
         <button
           type="button"
-          title="Close"
-          aria-label="Close"
+          title={m.common.close}
+          aria-label={m.common.close}
           onClick={onClose}
           style={{
             width: 28,
@@ -99,51 +102,51 @@ export function BulkUpdateModal({ onClose, onSave }: BulkUpdateModalProps) {
       </div>
 
       <div style={{ padding: 'var(--space-5) var(--space-7) var(--space-4)' }}>
-        <FormRow label="Naming status" layout="stacked" colon={false}>
+        <FormRow label={m.query.namingStatus} layout="stacked" colon={false}>
           <Select
-            options={[...BULK_NAMING_STATUS]}
+            options={catalogOptions(m.catalog, BULK_NAMING_STATUS)}
             value={namingStatus}
-            placeholder="Select…"
+            placeholder={m.query.selectPlaceholder}
             onChange={(e) => setNamingStatus(e.target.value)}
           />
         </FormRow>
-        <FormRow label="Building type" layout="stacked" colon={false}>
+        <FormRow label={m.query.buildingType} layout="stacked" colon={false}>
           <Select
-            options={[...BULK_BUILDING_TYPE]}
+            options={catalogOptions(m.catalog, BULK_BUILDING_TYPE)}
             value={buildingType}
-            placeholder="Select…"
+            placeholder={m.query.selectPlaceholder}
             onChange={(e) => setBuildingType(e.target.value)}
           />
         </FormRow>
-        <FormRow label="Use type" layout="stacked" colon={false}>
+        <FormRow label={m.query.useType} layout="stacked" colon={false}>
           <Select
-            options={[...BULK_USE_TYPE]}
+            options={catalogOptions(m.catalog, BULK_USE_TYPE)}
             value={useType}
-            placeholder="Select…"
+            placeholder={m.query.selectPlaceholder}
             onChange={(e) => setUseType(e.target.value)}
           />
         </FormRow>
-        <FormRow label="Wilaya" layout="stacked" colon={false}>
+        <FormRow label={m.query.wilaya} layout="stacked" colon={false}>
           <Select
             options={[...BULK_WILAYA]}
             value={wilaya}
-            placeholder="Select…"
+            placeholder={m.query.selectPlaceholder}
             onChange={(e) => setWilaya(e.target.value)}
           />
         </FormRow>
-        <FormRow label="Validation status" layout="stacked" colon={false}>
+        <FormRow label={m.query.validationStatus} layout="stacked" colon={false}>
           <Select
-            options={[...BULK_VALIDATION]}
+            options={catalogOptions(m.catalog, BULK_VALIDATION)}
             value={validation}
-            placeholder="Select…"
+            placeholder={m.query.selectPlaceholder}
             onChange={(e) => setValidation(e.target.value)}
           />
         </FormRow>
-        <FormRow label="Postal code" layout="stacked" colon={false}>
+        <FormRow label={m.query.postalCode} layout="stacked" colon={false}>
           <Select
             options={[...BULK_POSTAL_CODE]}
             value={postalCode}
-            placeholder="Select…"
+            placeholder={m.query.selectPlaceholder}
             onChange={(e) => setPostalCode(e.target.value)}
           />
         </FormRow>
@@ -155,7 +158,7 @@ export function BulkUpdateModal({ onClose, onSave }: BulkUpdateModalProps) {
             <path d="M5 12l5 5L20 7" />
           </svg>
         }>
-          Save
+          {m.common.save}
         </Button>
       </div>
     </div>

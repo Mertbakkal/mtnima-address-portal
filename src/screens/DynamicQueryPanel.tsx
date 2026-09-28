@@ -4,9 +4,14 @@ import {
   MOCK_PREVIEW_ROWS,
   PREVIEW_COLUMNS,
   type BulkUpdatePatch,
+  type PreviewColumnKey,
   type QueryPreviewRow,
 } from '../data/dynamicQuery';
 import { BulkUpdateModal } from './BulkUpdateModal';
+import { useI18n } from '../i18n/LocaleProvider';
+import { catalogLabel } from '../i18n/messages';
+
+const VALUE_COLUMNS = new Set<PreviewColumnKey>(['buildingType', 'useType', 'namingStatus', 'validationStatus']);
 
 export interface DynamicQueryPanelProps {
   onClose: () => void;
@@ -54,6 +59,21 @@ function ToolIconButton({
 }
 
 export function DynamicQueryPanel({ onClose }: DynamicQueryPanelProps) {
+  const { m } = useI18n();
+  const columnLabels: Record<PreviewColumnKey, string> = {
+    digitalAddress: m.query.digitalAddress,
+    streetName: m.query.streetName,
+    streetCode: m.query.streetCode,
+    wilaya: m.query.wilaya,
+    moughataa: m.query.moughataa,
+    commune: m.query.commune,
+    buildingType: m.query.buildingType,
+    useType: m.query.useType,
+    namingStatus: m.query.namingStatus,
+    validationStatus: m.query.validationStatus,
+    postalCode: m.query.postalCode,
+    recordDate: m.query.recordDate,
+  };
   const [minimized, setMinimized] = useState(false);
   const [rows, setRows] = useState<QueryPreviewRow[]>(() => MOCK_PREVIEW_ROWS.map((r) => ({ ...r })));
   const [selected, setSelected] = useState<Record<string, boolean>>(() =>
@@ -98,7 +118,7 @@ export function DynamicQueryPanel({ onClose }: DynamicQueryPanelProps) {
   return (
     <div
       role="dialog"
-      aria-label="Quick Search"
+      aria-label={m.query.title}
       style={{
         width: minimized ? 360 : '100%',
         height: minimized ? 'auto' : '100%',
@@ -131,15 +151,15 @@ export function DynamicQueryPanel({ onClose }: DynamicQueryPanelProps) {
           lineHeight: 'var(--leading-snug)',
           color: 'var(--text-on-accent)',
         }}>
-          Quick Search
+          {m.query.title}
         </h2>
-        <button type="button" title={minimized ? 'Restore' : 'Minimize'} aria-label={minimized ? 'Restore' : 'Minimize'}
+        <button type="button" title={minimized ? m.common.restore : m.common.minimize} aria-label={minimized ? m.common.restore : m.common.minimize}
           onClick={() => setMinimized((m) => !m)} style={headerBtn}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
             <path d="M5 12h14" />
           </svg>
         </button>
-        <button type="button" title="Close" aria-label="Close" onClick={onClose} style={headerBtn}>
+        <button type="button" title={m.common.close} aria-label={m.common.close} onClick={onClose} style={headerBtn}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
             <path d="M5 5l14 14M19 5L5 19" />
           </svg>
@@ -171,7 +191,7 @@ export function DynamicQueryPanel({ onClose }: DynamicQueryPanelProps) {
               fontWeight: 'var(--weight-semibold)',
               color: 'var(--green-700)',
             }}>
-              Query Preview
+              {m.query.preview}
             </div>
             <div style={{ padding: 'var(--space-5) var(--space-6)', minWidth: 0, overflow: 'hidden' }}>
               <div style={{
@@ -183,13 +203,13 @@ export function DynamicQueryPanel({ onClose }: DynamicQueryPanelProps) {
                 marginBottom: 'var(--space-4)',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                  <ToolIconButton label="Locate on map" bg="var(--blue-500)">
+                  <ToolIconButton label={m.query.locate} bg="var(--blue-500)">
                     <Icon name="map-pin" size={16} style={{ filter: 'brightness(10)' }} />
                   </ToolIconButton>
-                  <ToolIconButton label="Layers" bg="var(--amber-500)">
+                  <ToolIconButton label={m.query.layers} bg="var(--amber-500)">
                     <Icon name="map-layers" size={16} style={{ filter: 'brightness(10)' }} />
                   </ToolIconButton>
-                  <ToolIconButton label="Delete selected" bg="var(--red-500)" onClick={handleDeleteSelected}>
+                  <ToolIconButton label={m.query.deleteSelected} bg="var(--red-500)" onClick={handleDeleteSelected}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" aria-hidden="true">
                       <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" />
                     </svg>
@@ -202,20 +222,20 @@ export function DynamicQueryPanel({ onClose }: DynamicQueryPanelProps) {
                     padding: '6px 10px',
                     background: 'var(--surface-page)',
                   }}>
-                    {PREVIEW_COLUMNS.length} columns shown
+                    {m.query.columnsShown(PREVIEW_COLUMNS.length)}
                   </span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                  <ToolIconButton label="Export" bg="var(--green-500)">
+                  <ToolIconButton label={m.query.export} bg="var(--green-500)">
                     <Icon name="section-network" size={16} style={{ filter: 'brightness(10)' }} />
                   </ToolIconButton>
-                  <ToolIconButton label="Print" bg="var(--green-500)">
+                  <ToolIconButton label={m.query.print} bg="var(--green-500)">
                     <Icon name="map-print" size={16} style={{ filter: 'brightness(10)' }} />
                   </ToolIconButton>
-                  <ToolIconButton label="Bulk Update" bg="var(--green-500)" onClick={() => setBulkOpen(true)}>
+                  <ToolIconButton label={m.query.bulkUpdate} bg="var(--green-500)" onClick={() => setBulkOpen(true)}>
                     <Icon name="section-basic-info" size={16} style={{ filter: 'brightness(10)' }} />
                   </ToolIconButton>
-                  <ToolIconButton label="Stop" bg="var(--blue-500)">
+                  <ToolIconButton label={m.query.stop} bg="var(--blue-500)">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
                       <rect x="6" y="6" width="12" height="12" rx="1" />
                     </svg>
@@ -241,7 +261,7 @@ export function DynamicQueryPanel({ onClose }: DynamicQueryPanelProps) {
                   <thead>
                     <tr style={{ background: 'var(--gray-100)' }}>
                       <th style={{ padding: '8px 10px', textAlign: 'left', borderBottom: '1px solid var(--border-panel)', width: 36 }}>
-                        <input type="checkbox" checked={allSelected} onChange={toggleAll} aria-label="Select all" />
+                        <input type="checkbox" checked={allSelected} onChange={toggleAll} aria-label={m.query.selectAll} />
                       </th>
                       {PREVIEW_COLUMNS.map((col) => (
                         <th key={col.key} style={{
@@ -253,7 +273,7 @@ export function DynamicQueryPanel({ onClose }: DynamicQueryPanelProps) {
                           whiteSpace: 'nowrap',
                         }}>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                            {col.label}
+                            {columnLabels[col.key]}
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--gray-500)" strokeWidth="2" aria-hidden="true">
                               <path d="M7 15l5 5 5-5M7 9l5-5 5 5" />
                             </svg>
@@ -273,7 +293,7 @@ export function DynamicQueryPanel({ onClose }: DynamicQueryPanelProps) {
                             type="checkbox"
                             checked={Boolean(selected[row.id])}
                             onChange={() => setSelected((prev) => ({ ...prev, [row.id]: !prev[row.id] }))}
-                            aria-label={`Select ${row.digitalAddress}`}
+                            aria-label={m.query.selectRow(row.digitalAddress)}
                           />
                         </td>
                         {PREVIEW_COLUMNS.map((col) => (
@@ -283,7 +303,7 @@ export function DynamicQueryPanel({ onClose }: DynamicQueryPanelProps) {
                             color: 'var(--navy-700)',
                             whiteSpace: 'nowrap',
                           }}>
-                            {row[col.key]}
+                            {VALUE_COLUMNS.has(col.key) ? catalogLabel(m.catalog, row[col.key]) : row[col.key]}
                           </td>
                         ))}
                       </tr>

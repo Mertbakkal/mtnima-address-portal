@@ -1,4 +1,5 @@
 import { useState, type CSSProperties, type SelectHTMLAttributes } from 'react';
+import { useI18n } from '../../i18n/LocaleProvider';
 
 export interface SelectOption {
   value: string;
@@ -13,8 +14,10 @@ export interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement
 }
 
 export function Select({
-  options = [], placeholder = 'Select...', disabled = false, readOnlyLook = false, style, ...rest
+  options = [], placeholder: placeholderProp, disabled = false, readOnlyLook = false, style, ...rest
 }: SelectProps) {
+  const { m } = useI18n();
+  const placeholder = placeholderProp === undefined ? m.common.select : placeholderProp;
   const [focus, setFocus] = useState(false);
   const [hover, setHover] = useState(false);
   return (

@@ -11,6 +11,8 @@ import { ReadOnlyField } from '../components/forms/ReadOnlyField';
 import { Button } from '../components/core/Button';
 import { Icon } from '../components/core/Icon';
 import type { RoadAddress } from '../data/roadAddresses';
+import { useI18n } from '../i18n/LocaleProvider';
+import { catalogLabel, catalogOptions } from '../i18n/messages';
 
 export interface StreetPanelProps {
   onClose: () => void;
@@ -18,10 +20,6 @@ export interface StreetPanelProps {
   addresses?: RoadAddress[];
   onCenterAddress?: (address: RoadAddress) => void;
 }
-
-const emptyTab = (
-  <div style={{ padding: 16, fontSize: 13, color: 'var(--label-500)' }}>No records found.</div>
-);
 
 const readOnlyValueStyle = { background: 'transparent', border: 'none', paddingLeft: 0 } as const;
 
@@ -58,19 +56,22 @@ function AddressesTab({
   addresses: RoadAddress[];
   onCenterAddress?: (address: RoadAddress) => void;
 }) {
-  if (addresses.length === 0) return emptyTab;
+  const { m } = useI18n();
+  if (addresses.length === 0) {
+    return <div style={{ padding: 16, fontSize: 13, color: 'var(--label-500)' }}>{m.street.empty}</div>;
+  }
   return (
     <div style={{ margin: 'calc(var(--space-4) * -1) calc(var(--space-7) * -1) calc(var(--space-8) * -1)' }}>
       <div style={{ padding: '12px 14px 10px', fontSize: 13, lineHeight: 1.7, color: 'var(--gray-800)' }}>
-        <div>Number of addresses on the road : {addresses.length}</div>
-        <div>All road addresses are certified : NO</div>
+        <div>{m.street.addressCount(addresses.length)}</div>
+        <div>{m.street.allCertified}</div>
       </div>
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, fontFamily: 'var(--font-ui)' }}>
         <thead>
           <tr style={{ background: 'var(--gray-100)' }}>
-            <th style={thStyle}>List of numbers</th>
-            <th style={{ ...thStyle, width: 92, textAlign: 'center' }}>Certified</th>
-            <th style={{ ...thStyle, width: 76, textAlign: 'center' }}>Center</th>
+            <th style={thStyle}>{m.street.numberList}</th>
+            <th style={{ ...thStyle, width: 92, textAlign: 'center' }}>{m.street.certified}</th>
+            <th style={{ ...thStyle, width: 76, textAlign: 'center' }}>{m.common.center}</th>
           </tr>
         </thead>
         <tbody>
@@ -78,15 +79,15 @@ function AddressesTab({
             <tr key={`${address.number}-${index}`} style={{ background: index % 2 === 0 ? 'var(--gray-50)' : 'var(--gray-0)' }}>
               <td style={{ padding: '7px 12px', color: 'var(--gray-800)' }}>{address.number}</td>
               <td style={{ padding: '7px 12px' }}>
-                <span style={{ display: 'flex', justifyContent: 'center' }} title="Not certified">
+                <span style={{ display: 'flex', justifyContent: 'center' }} title={m.street.notCertified}>
                   <CertifiedMark />
                 </span>
               </td>
               <td style={{ padding: '7px 12px', textAlign: 'center' }}>
                 <button
                   type="button"
-                  title="Center"
-                  aria-label={`Center on address ${address.number}`}
+                  title={m.common.center}
+                  aria-label={m.street.centerOn(address.number)}
                   onClick={() => onCenterAddress?.(address)}
                   style={{
                     display: 'inline-flex',
@@ -112,43 +113,48 @@ function AddressesTab({
 }
 
 export function StreetPanel({ onClose, onDelete, addresses = [], onCenterAddress }: StreetPanelProps) {
-  const [tab, setTab] = useState('Road');
+  const { m } = useI18n();
+  const [tab, setTab] = useState('road');
   return (
-    <AttributePanel title="Road" icon={<Icon name="tool-street-info" size={22} />} onClose={onClose}
-      tabs={<Tabs value={tab} onChange={setTab} tabs={['Road', 'Addresses', 'Street signs']} />}
+    <AttributePanel title={m.street.road} icon={<Icon name="tool-street-info" size={22} />} onClose={onClose}
+      tabs={<Tabs value={tab} onChange={setTab} tabs={[
+        { id: 'road', label: m.street.road },
+        { id: 'addresses', label: m.street.addresses },
+        { id: 'signs', label: m.street.signs },
+      ]} />}
       footer={<>
-        <Button variant="danger" onClick={onDelete}>Delete</Button>
-        <Button style={{ marginLeft: 'auto' }}>Save</Button>
+        <Button variant="danger" onClick={onDelete}>{m.common.delete}</Button>
+        <Button style={{ marginLeft: 'auto' }}>{m.common.save}</Button>
       </>}>
-      {tab === 'Road' && <>
+      {tab === 'road' && <>
         <div style={{ display: 'grid', gap: 10, padding: '14px 14px 4px' }}>
-          <FormRow layout="stacked" label="Road type"><Select placeholder="—" options={['Boulevard', 'Avenue', 'Rue', 'Ruelle']} /></FormRow>
-          <FormRow layout="stacked" label="Road name"><SearchField placeholder="Enter a name..." /></FormRow>
+          <FormRow layout="stacked" label={m.street.roadType}><Select placeholder="—" options={catalogOptions(m.catalog, ['Boulevard', 'Avenue', 'Rue', 'Ruelle'])} /></FormRow>
+          <FormRow layout="stacked" label={m.street.roadName}><SearchField placeholder={m.street.enterName} /></FormRow>
         </div>
-        <PanelSectionHeader>Road</PanelSectionHeader>
+        <PanelSectionHeader>{m.street.road}</PanelSectionHeader>
         <div style={{ padding: '10px 14px 14px' }}>
-          <FormRow labelWidth="200px" label="Code"><Input mono defaultValue="11.TKS" /></FormRow>
-          <FormRow labelWidth="200px" label="Naming status">
-            <Select placeholder={null} defaultValue="To be named" options={['To be named', 'Proposed', 'Official']} />
+          <FormRow labelWidth="200px" label={m.street.code}><Input mono defaultValue="11.TKS" /></FormRow>
+          <FormRow labelWidth="200px" label={m.street.namingStatus}>
+            <Select placeholder={null} defaultValue="To be named" options={catalogOptions(m.catalog, ['To be named', 'Proposed', 'Official'])} />
           </FormRow>
-          <FormRow labelWidth="200px" label="Number of addresses on the road">
+          <FormRow labelWidth="200px" label={m.street.addressCountLabel}>
             <ReadOnlyField mono value={String(addresses.length)} style={readOnlyValueStyle} />
           </FormRow>
-          <FormRow labelWidth="200px" label="All road addresses are certified">
-            <ReadOnlyField mono value="NO" style={readOnlyValueStyle} />
+          <FormRow labelWidth="200px" label={m.street.allCertifiedLabel}>
+            <ReadOnlyField mono value={catalogLabel(m.catalog, 'NO')} style={readOnlyValueStyle} />
           </FormRow>
-          <FormRow labelWidth="200px" label="Number of street signs">
+          <FormRow labelWidth="200px" label={m.street.signCount}>
             <ReadOnlyField mono value="0" style={readOnlyValueStyle} />
           </FormRow>
-          <FormRow labelWidth="200px" label="All street signs are placed">
-            <ReadOnlyField mono value="NO" style={readOnlyValueStyle} />
+          <FormRow labelWidth="200px" label={m.street.allSignsPlaced}>
+            <ReadOnlyField mono value={catalogLabel(m.catalog, 'NO')} style={readOnlyValueStyle} />
           </FormRow>
-          <FormRow layout="stacked" label="Comment"><Textarea rows={3} /></FormRow>
-          <FormRow layout="stacked" label="Road name history"><Textarea rows={3} /></FormRow>
+          <FormRow layout="stacked" label={m.street.comment}><Textarea rows={3} /></FormRow>
+          <FormRow layout="stacked" label={m.street.nameHistory}><Textarea rows={3} /></FormRow>
         </div>
       </>}
-      {tab === 'Addresses' && <AddressesTab addresses={addresses} onCenterAddress={onCenterAddress} />}
-      {tab === 'Street signs' && emptyTab}
+      {tab === 'addresses' && <AddressesTab addresses={addresses} onCenterAddress={onCenterAddress} />}
+      {tab === 'signs' && <div style={{ padding: 16, fontSize: 13, color: 'var(--label-500)' }}>{m.street.empty}</div>}
     </AttributePanel>
   );
 }

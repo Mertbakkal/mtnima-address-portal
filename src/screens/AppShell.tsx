@@ -18,15 +18,16 @@ import type { DutyPlaceMode } from './TaskDetailsWizard';
 import type { MapFocus } from '../data/hierarchySearch';
 import type { GeocodeResult } from '../data/geocodeSearch';
 import type { RoadAddress } from '../data/roadAddresses';
+import { useI18n } from '../i18n/LocaleProvider';
 
 export type ModuleId = 'address' | 'search' | 'hier' | 'task' | 'dashboard' | null;
 export type ToolId = 'draw' | 'point' | 'move' | 'ainfo' | null;
 type PanelId = 'street' | 'address' | null;
 
 const ADDRESS_TOOLS = [
-  { id: 'draw', iconName: 'tool-street-draw', label: 'Draw Street' },
-  { id: 'point', iconName: 'tool-address-point', label: 'Draw Address Point' },
-  { id: 'move', iconName: 'tool-address-move', label: 'Move Point' },
+  { id: 'draw', iconName: 'tool-street-draw', labelKey: 'drawStreet' },
+  { id: 'point', iconName: 'tool-address-point', labelKey: 'drawPoint' },
+  { id: 'move', iconName: 'tool-address-move', labelKey: 'movePoint' },
 ] as const;
 
 function DashIcon() {
@@ -39,6 +40,7 @@ function DashIcon() {
 }
 
 export function AppShell() {
+  const { m } = useI18n();
   const [loggedIn, setLoggedIn] = useState(false);
   const [module, setModule] = useState<ModuleId>(null);
   const [tool, setTool] = useState<ToolId>(null);
@@ -132,18 +134,18 @@ export function AppShell() {
   const navItems = [
     {
       id: 'address',
-      label: 'Addresses',
+      label: m.nav.addresses,
       icon: <Icon name="nav-home" size={16} />,
       dropdown: ADDRESS_TOOLS.map((t) => ({
         id: t.id,
-        label: t.label,
+        label: m.nav[t.labelKey],
         icon: <Icon name={t.iconName} size={20} /> as ReactNode,
       })),
     },
-    { id: 'search', label: 'Quick Search', icon: <DotsIcon /> },
-    { id: 'hier', label: 'Hierarchical Address Search', icon: <Icon name="nav-hierarchy" size={16} /> },
-    { id: 'task', label: 'Task Management', icon: <Icon name="nav-tasks" size={16} /> },
-    { id: 'dashboard', label: 'Dashboard', icon: <DashIcon /> },
+    { id: 'search', label: m.nav.quickSearch, icon: <DotsIcon /> },
+    { id: 'hier', label: m.nav.hierarchical, icon: <Icon name="nav-hierarchy" size={16} /> },
+    { id: 'task', label: m.nav.tasks, icon: <Icon name="nav-tasks" size={16} /> },
+    { id: 'dashboard', label: m.nav.dashboard, icon: <DashIcon /> },
   ];
 
   const guestChrome = (
@@ -153,7 +155,7 @@ export function AppShell() {
         shape="round"
         tone="solid"
         icon={<Icon name="nav-user" size={18} />}
-        label="Account"
+        label={m.nav.account}
         onClick={() => setCitizenLoginOpen(true)}
       />
     </div>
@@ -380,11 +382,11 @@ export function AppShell() {
         crs={crs}
         crsOptions={['WGS84 (EPSG:4326)', 'UTM 28N (EPSG:32628)']}
         onCrsChange={(e) => setCrs(e.target.value)}
-        crsLabel="Coordinate system"
-        scaleLabel="Scale"
-        latLabel="Lat"
-        lonLabel="Lon"
-        copyLabel="Copy coordinates"
+        crsLabel={m.status.crs}
+        scaleLabel={m.status.scale}
+        latLabel={m.status.lat}
+        lonLabel={m.status.lon}
+        copyLabel={m.status.copy}
         lat={cursor.lat}
         lon={cursor.lon}
         scale={scale}
