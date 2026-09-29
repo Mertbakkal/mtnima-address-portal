@@ -5,7 +5,6 @@ import { Select } from '../components/forms/Select';
 import {
   getCommuneNames,
   getMoughataaNames,
-  getStreetNames,
   getWilayaNames,
   resolveHierarchyFocus,
   type HierarchySelection,
@@ -35,16 +34,12 @@ export function HierarchicalAddressSearchModal({ onClose, onShow }: Hierarchical
   const communes = selection.wilaya && selection.moughataa
     ? getCommuneNames(selection.wilaya, selection.moughataa)
     : [];
-  const streets = selection.wilaya && selection.moughataa && selection.commune
-    ? getStreetNames(selection.wilaya, selection.moughataa, selection.commune)
-    : [];
 
-  const setLevel = (level: keyof HierarchySelection, value: string) => {
+  const setLevel = (level: Exclude<keyof HierarchySelection, 'street'>, value: string) => {
     setSelection((prev) => {
       if (level === 'wilaya') return { wilaya: value, moughataa: '', commune: '', street: '' };
       if (level === 'moughataa') return { ...prev, moughataa: value, commune: '', street: '' };
-      if (level === 'commune') return { ...prev, commune: value, street: '' };
-      return { ...prev, street: value };
+      return { ...prev, commune: value, street: '' };
     });
   };
 
@@ -173,15 +168,6 @@ export function HierarchicalAddressSearchModal({ onClose, onShow }: Hierarchical
                 placeholder={m.hierarchy.selectCommune}
                 disabled={!selection.moughataa}
                 onChange={(e) => setLevel('commune', e.target.value)}
-              />
-            </FormRow>
-            <FormRow label={m.address.street} layout="stacked" colon={false}>
-              <Select
-                options={streets}
-                value={selection.street || ''}
-                placeholder={m.hierarchy.selectStreet}
-                disabled={!selection.commune}
-                onChange={(e) => setLevel('street', e.target.value)}
               />
             </FormRow>
           </div>
