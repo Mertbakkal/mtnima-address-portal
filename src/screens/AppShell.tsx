@@ -14,6 +14,7 @@ import { CitizenLoginModal } from './CitizenLoginModal';
 import { AdresTespitButton, AdresTespitModal } from './AdresTespitModal';
 import { SearchGeocodeModal } from './SearchGeocodeModal';
 import { TaskListModal } from './TaskListModal';
+import { DashboardPanel } from './DashboardPanel';
 import type { DutyPlaceMode } from './TaskDetailsWizard';
 import type { MapFocus } from '../data/hierarchySearch';
 import type { GeocodeResult } from '../data/geocodeSearch';
@@ -328,6 +329,23 @@ export function AppShell() {
               onHierarchyFocus={handleHierarchyShow}
               mapDrawMode={polygonDrawActive}
             />
+          </div>
+        )}
+
+        {loggedIn && module === 'dashboard' && (
+          <div style={{
+            position: 'absolute',
+            top: 64,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            bottom: 12,
+            width: 'min(1280px, calc(100% - 24px))',
+            zIndex: 720,
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0,
+          }}>
+            <DashboardPanel onClose={() => setModule(null)} />
           </div>
         )}
 

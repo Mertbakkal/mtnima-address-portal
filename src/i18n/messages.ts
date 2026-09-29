@@ -333,6 +333,38 @@ export interface Messages {
     note: string;
     notePlaceholder: string;
   };
+  dashboard: {
+    pointsByUnit: string;
+    byWilaya: string;
+    byMoughataa: string;
+    byCommune: string;
+    totalPoints: string;
+    other: string;
+    certStatus: string;
+    approved: string;
+    pending: string;
+    rejected: string;
+    underReview: string;
+    totalApplications: string;
+    pointsOverTime: string;
+    monthly: string;
+    quarterly: string;
+    yearly: string;
+    pointCountAxis: string;
+    totalCertTitle: string;
+    months: {
+      jan: string;
+      feb: string;
+      mar: string;
+      apr: string;
+      may: string;
+      jun: string;
+      jul: string;
+      aug: string;
+      sep: string;
+    };
+    quarter: (n: number, year: number) => string;
+  };
 }
 
 const catalogEn: Messages['catalog'] = {
@@ -701,6 +733,38 @@ export const messages: Record<Locale, Messages> = {
       note: 'Validator note',
       notePlaceholder: 'Enter a note...',
     },
+    dashboard: {
+      pointsByUnit: 'Address Point Count by Administrative Unit',
+      byWilaya: 'By Wilaya',
+      byMoughataa: 'By Moughataa',
+      byCommune: 'By Commune',
+      totalPoints: 'TOTAL ADDRESS POINTS',
+      other: 'Other',
+      certStatus: 'Address Certificate Application Status',
+      approved: 'Approved',
+      pending: 'Pending',
+      rejected: 'Rejected',
+      underReview: 'Under Review',
+      totalApplications: 'TOTAL APPLICATIONS',
+      pointsOverTime: 'Address Point Count Over Time',
+      monthly: 'Monthly',
+      quarterly: 'Quarterly',
+      yearly: 'Yearly',
+      pointCountAxis: 'Address Point Count',
+      totalCertTitle: 'Total Address Certificate Applications',
+      months: {
+        jan: 'January',
+        feb: 'February',
+        mar: 'March',
+        apr: 'April',
+        may: 'May',
+        jun: 'June',
+        jul: 'July',
+        aug: 'August',
+        sep: 'September',
+      },
+      quarter: (n, year) => `Q${n} ${year}`,
+    },
   },
   fr: {
     lang: { menu: 'Langue', english: 'English', french: 'Français' },
@@ -998,6 +1062,38 @@ export const messages: Record<Locale, Messages> = {
       recordDate: 'Date d’enregistrement',
       note: 'Note du validateur',
       notePlaceholder: 'Saisir une note...',
+    },
+    dashboard: {
+      pointsByUnit: 'Nombre de points d’adresse par unité administrative',
+      byWilaya: 'Par wilaya',
+      byMoughataa: 'Par moughataa',
+      byCommune: 'Par commune',
+      totalPoints: 'TOTAL DES POINTS D’ADRESSE',
+      other: 'Autres',
+      certStatus: 'Statut des demandes de certificat d’adresse',
+      approved: 'Approuvé',
+      pending: 'En attente',
+      rejected: 'Rejeté',
+      underReview: 'En cours d’examen',
+      totalApplications: 'TOTAL DES DEMANDES',
+      pointsOverTime: 'Nombre de points d’adresse dans le temps',
+      monthly: 'Mensuel',
+      quarterly: 'Trimestriel',
+      yearly: 'Annuel',
+      pointCountAxis: 'Nombre de points d’adresse',
+      totalCertTitle: 'Total des demandes de certificat d’adresse',
+      months: {
+        jan: 'Janvier',
+        feb: 'Février',
+        mar: 'Mars',
+        apr: 'Avril',
+        may: 'Mai',
+        jun: 'Juin',
+        jul: 'Juillet',
+        aug: 'Août',
+        sep: 'Septembre',
+      },
+      quarter: (n, year) => `T${n} ${year}`,
     },
   },
 };
