@@ -119,7 +119,7 @@ export function AddressPointPanel({
         <div style={{ padding: '10px 14px' }}>
           <FormRow labelWidth="124px" label={m.address.buildingType}><Select defaultValue="Residential" placeholder={null} options={catalogOptions(m.catalog, ['Residential', 'Commercial', 'Public'])} /></FormRow>
           <FormRow labelWidth="124px" label={m.address.useType}><Select defaultValue="Residential" placeholder={null} options={catalogOptions(m.catalog, ['Residential', 'Business', 'Storage'])} /></FormRow>
-          <FormRow labelWidth="124px" label={m.address.postalCode}><Input mono defaultValue="1000" /></FormRow>
+          <FormRow labelWidth="124px" label={m.address.postalCode}><Input mono defaultValue="NC02-A05" /></FormRow>
           <FormRow labelWidth="124px" label={m.address.validation}><StatusBadge tone="success">{m.catalog.Validated}</StatusBadge></FormRow>
           <FormRow layout="stacked" label={m.address.fieldNote}><Textarea rows={2} readOnlyLook defaultValue={m.address.fieldNoteText} /></FormRow>
         </div>
