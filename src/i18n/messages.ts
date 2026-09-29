@@ -253,6 +253,8 @@ export interface Messages {
     recordDate: string;
     selectPlaceholder: string;
     bulkTitle: string;
+    filterColumn: (label: string) => string;
+    noResults: string;
   };
   tasks: {
     title: string;
@@ -653,6 +655,8 @@ export const messages: Record<Locale, Messages> = {
       recordDate: 'Record date',
       selectPlaceholder: 'Select…',
       bulkTitle: 'Bulk Address Update',
+      filterColumn: (label) => `Filter ${label}`,
+      noResults: 'No matching rows',
     },
     tasks: {
       title: 'Task Management',
@@ -983,6 +987,8 @@ export const messages: Record<Locale, Messages> = {
       recordDate: 'Date d’enregistrement',
       selectPlaceholder: 'Sélectionner…',
       bulkTitle: 'Mise à jour groupée des adresses',
+      filterColumn: (label) => `Filtrer ${label}`,
+      noResults: 'Aucun résultat',
     },
     tasks: {
       title: 'Gestion des tâches',
