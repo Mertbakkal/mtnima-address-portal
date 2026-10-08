@@ -91,6 +91,11 @@ export interface Messages {
     Avenue: string;
     Rue: string;
     Ruelle: string;
+    Open: string;
+    UnderConstruction: string;
+    Closed: string;
+    Private: string;
+    Mixed: string;
     NO: string;
     leaseOrUtility: string;
     signatureCircular: string;
@@ -138,17 +143,21 @@ export interface Messages {
     certified: string;
     notCertified: string;
     centerOn: (number: string) => string;
+    id: string;
+    roadCode: string;
     roadType: string;
+    selectRoadType: string;
     roadName: string;
-    enterName: string;
-    code: string;
-    namingStatus: string;
-    addressCountLabel: string;
-    allCertifiedLabel: string;
-    signCount: string;
-    allSignsPlaced: string;
-    comment: string;
-    nameHistory: string;
+    roadStatus: string;
+    selectRoadStatus: string;
+    roadOwnership: string;
+    selectRoadOwnership: string;
+    wilaya: string;
+    moughataa: string;
+    commune: string;
+    locality: string;
+    description: string;
+    dataHistory: string;
   };
   demand: {
     title: string;
@@ -387,6 +396,11 @@ const catalogEn: Messages['catalog'] = {
   Avenue: 'Avenue',
   Rue: 'Rue',
   Ruelle: 'Ruelle',
+  Open: 'Open',
+  UnderConstruction: 'Under construction',
+  Closed: 'Closed',
+  Private: 'Private',
+  Mixed: 'Mixed',
   NO: 'NO',
   leaseOrUtility: 'Lease agreement, title deed, or utility bill',
   signatureCircular: 'Signature circular / power of attorney',
@@ -421,6 +435,11 @@ const catalogFr: Messages['catalog'] = {
   Avenue: 'Avenue',
   Rue: 'Rue',
   Ruelle: 'Ruelle',
+  Open: 'Ouvert',
+  UnderConstruction: 'En construction',
+  Closed: 'Fermé',
+  Private: 'Privé',
+  Mixed: 'Mixte',
   NO: 'NON',
   leaseOrUtility: 'Contrat de bail, titre de propriété ou facture de service',
   signatureCircular: 'Signature circulaire / procuration',
@@ -540,17 +559,21 @@ export const messages: Record<Locale, Messages> = {
       certified: 'Certified',
       notCertified: 'Not certified',
       centerOn: (number) => `Center on address ${number}`,
+      id: 'ID',
+      roadCode: 'Road code',
       roadType: 'Road type',
+      selectRoadType: 'Select road type',
       roadName: 'Road name',
-      enterName: 'Enter a name...',
-      code: 'Code',
-      namingStatus: 'Naming status',
-      addressCountLabel: 'Number of addresses on the road',
-      allCertifiedLabel: 'All road addresses are certified',
-      signCount: 'Number of street signs',
-      allSignsPlaced: 'All street signs are placed',
-      comment: 'Comment',
-      nameHistory: 'Road name history',
+      roadStatus: 'Road status',
+      selectRoadStatus: 'Select road status',
+      roadOwnership: 'Road ownership',
+      selectRoadOwnership: 'Select road ownership',
+      wilaya: 'Wilaya',
+      moughataa: 'Moughataa',
+      commune: 'Commune',
+      locality: 'Locality',
+      description: 'Description',
+      dataHistory: 'Data history',
     },
     demand: {
       title: 'Demand verification',
@@ -872,17 +895,21 @@ export const messages: Record<Locale, Messages> = {
       certified: 'Certifié',
       notCertified: 'Non certifié',
       centerOn: (number) => `Centrer sur l’adresse ${number}`,
+      id: 'ID',
+      roadCode: 'Code de route',
       roadType: 'Type de route',
+      selectRoadType: 'Sélectionner le type de route',
       roadName: 'Nom de la route',
-      enterName: 'Saisir un nom...',
-      code: 'Code',
-      namingStatus: 'Statut de dénomination',
-      addressCountLabel: 'Nombre d’adresses sur la route',
-      allCertifiedLabel: 'Toutes les adresses de la route sont certifiées',
-      signCount: 'Nombre de plaques de rue',
-      allSignsPlaced: 'Toutes les plaques de rue sont posées',
-      comment: 'Commentaire',
-      nameHistory: 'Historique du nom de la route',
+      roadStatus: 'Statut de la route',
+      selectRoadStatus: 'Sélectionner le statut de la route',
+      roadOwnership: 'Propriété de la route',
+      selectRoadOwnership: 'Sélectionner la propriété de la route',
+      wilaya: 'Wilaya',
+      moughataa: 'Moughataa',
+      commune: 'Commune',
+      locality: 'Localité',
+      description: 'Description',
+      dataHistory: 'Historique des données',
     },
     demand: {
       title: 'Vérification de la demande',
@@ -1122,6 +1149,11 @@ const CATALOG_FROM_VALUE: Record<string, keyof Messages['catalog']> = {
   Avenue: 'Avenue',
   Rue: 'Rue',
   Ruelle: 'Ruelle',
+  Open: 'Open',
+  'Under construction': 'UnderConstruction',
+  Closed: 'Closed',
+  Private: 'Private',
+  Mixed: 'Mixed',
   NO: 'NO',
   'Lease agreement, title deed, or utility bill': 'leaseOrUtility',
   'Signature circular / power of attorney': 'signatureCircular',
