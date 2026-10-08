@@ -126,7 +126,6 @@ export function StreetPanel({ onClose, onDelete, addresses = [], onCenterAddress
       tabs={<Tabs value={tab} onChange={setTab} tabs={[
         { id: 'road', label: m.street.road },
         { id: 'addresses', label: m.street.addresses },
-        { id: 'signs', label: m.street.signs },
       ]} />}
       footer={<>
         <Button variant="ghost" icon={<HistoryIcon />}>{m.street.dataHistory}</Button>
@@ -157,7 +156,6 @@ export function StreetPanel({ onClose, onDelete, addresses = [], onCenterAddress
         </div>
       )}
       {tab === 'addresses' && <AddressesTab addresses={addresses} onCenterAddress={onCenterAddress} />}
-      {tab === 'signs' && <div style={{ padding: 16, fontSize: 13, color: 'var(--label-500)' }}>{m.street.empty}</div>}
     </AttributePanel>
   );
 }

@@ -135,7 +135,6 @@ export interface Messages {
   street: {
     road: string;
     addresses: string;
-    signs: string;
     empty: string;
     addressCount: (n: number) => string;
     allCertified: string;
@@ -551,7 +550,6 @@ export const messages: Record<Locale, Messages> = {
     street: {
       road: 'Road',
       addresses: 'Addresses',
-      signs: 'Street signs',
       empty: 'No records found.',
       addressCount: (n) => `Number of addresses on the road : ${n}`,
       allCertified: 'All road addresses are certified : NO',
@@ -887,7 +885,6 @@ export const messages: Record<Locale, Messages> = {
     street: {
       road: 'Route',
       addresses: 'Adresses',
-      signs: 'Plaques de rue',
       empty: 'Aucun enregistrement.',
       addressCount: (n) => `Nombre d’adresses sur la route : ${n}`,
       allCertified: 'Toutes les adresses de la route sont certifiées : NON',
