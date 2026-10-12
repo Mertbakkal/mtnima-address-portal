@@ -61,6 +61,7 @@ export interface Messages {
     zoomLevel: string;
     zoomIn: string;
     zoomOut: string;
+    wilayaLegend: string;
     drawPolygon: string;
     drawStreet: string;
     drawPoint: string;
@@ -263,6 +264,7 @@ export interface Messages {
     bulkTitle: string;
     filterColumn: (label: string) => string;
     noResults: string;
+    boundaries: string;
   };
   tasks: {
     title: string;
@@ -513,6 +515,7 @@ export const messages: Record<Locale, Messages> = {
       zoomLevel: 'Zoom level',
       zoomIn: 'Zoom in',
       zoomOut: 'Zoom out',
+      wilayaLegend: 'Wilayas',
       drawPolygon: 'Click on the map to add polygon vertices — double-click to finish',
       drawStreet: 'Click on the map to add vertices — double-click to finish the street',
       drawPoint: 'Click on the map to place an address point',
@@ -678,6 +681,7 @@ export const messages: Record<Locale, Messages> = {
       bulkTitle: 'Bulk Address Update',
       filterColumn: (label) => `Filter ${label}`,
       noResults: 'No matching rows',
+      boundaries: 'Boundaries',
     },
     tasks: {
       title: 'Task Management',
@@ -848,6 +852,7 @@ export const messages: Record<Locale, Messages> = {
       zoomLevel: 'Niveau de zoom',
       zoomIn: 'Zoom avant',
       zoomOut: 'Zoom arrière',
+      wilayaLegend: 'Wilayas',
       drawPolygon: 'Cliquez sur la carte pour ajouter des sommets — double-cliquez pour terminer',
       drawStreet: 'Cliquez sur la carte pour ajouter des sommets — double-cliquez pour terminer la rue',
       drawPoint: 'Cliquez sur la carte pour placer un point d’adresse',
@@ -1013,6 +1018,7 @@ export const messages: Record<Locale, Messages> = {
       bulkTitle: 'Mise à jour groupée des adresses',
       filterColumn: (label) => `Filtrer ${label}`,
       noResults: 'Aucun résultat',
+      boundaries: 'Limites',
     },
     tasks: {
       title: 'Gestion des tâches',

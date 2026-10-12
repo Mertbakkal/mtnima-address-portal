@@ -19,6 +19,14 @@ import {
 } from '../data/geocodeSearch';
 import { pointInPolygon } from '../data/taskMissionWizard';
 import { buildRoadAddresses, type RoadAddress } from '../data/roadAddresses';
+import {
+  communeTooltip,
+  limitesAdmin,
+  WILAYA_LEGEND,
+  wilayaFill,
+  wilayaStroke,
+  type LimitesAdminProps,
+} from '../data/adminBoundaries';
 import type { ToolId } from './AppShell';
 
 const RAIL_TOOL_DEFS = [
@@ -96,6 +104,7 @@ export function MapCanvas({
   const drawLayer = useRef<L.LayerGroup | null>(null);
   const polygonLayer = useRef<L.LayerGroup | null>(null);
   const gridLayer = useRef<L.LayerGroup | null>(null);
+  const adminLayer = useRef<L.GeoJSON | null>(null);
   const gridHoverMarker = useRef<L.Marker | null>(null);
   const gridHoverLabel = useRef<string | null>(null);
   const draftRef = useRef<[number, number][]>([]);
@@ -222,6 +231,27 @@ export function MapCanvas({
     if (!host.current) return;
     const map = L.map(host.current, { center: CENTER, zoom: OVERVIEW_ZOOM, zoomControl: false, attributionControl: true });
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+    map.createPane('adminBoundaryPane');
+    const adminPane = map.getPane('adminBoundaryPane');
+    if (adminPane) adminPane.style.zIndex = '350';
+    adminLayer.current = L.geoJSON(limitesAdmin, {
+      pane: 'adminBoundaryPane',
+      style: (feature) => {
+        const pcode = (feature?.properties as LimitesAdminProps | undefined)?.ADM1_PCODE ?? '';
+        return {
+          color: wilayaStroke(pcode),
+          weight: 1.25,
+          opacity: 0.95,
+          fillColor: wilayaFill(pcode),
+          fillOpacity: 0.42,
+        };
+      },
+      onEachFeature: (feature, layer) => {
+        const props = feature.properties as LimitesAdminProps | null;
+        if (!props) return;
+        layer.bindTooltip(communeTooltip(props), { sticky: true, opacity: 0.96 });
+      },
+    });
     map.createPane('gridHoverPane');
     const hoverPane = map.getPane('gridHoverPane');
     if (hoverPane) hoverPane.style.zIndex = '650';
@@ -250,11 +280,21 @@ export function MapCanvas({
     return () => {
       map.getContainer().removeEventListener('mouseleave', hideGridHoverLabel);
       hideGridHoverLabel();
+      adminLayer.current = null;
       ro.disconnect();
       map.remove();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const layer = adminLayer.current;
+    if (!map || !layer) return;
+    const show = zoom < GRID_MIN_ZOOM;
+    if (show && !map.hasLayer(layer)) layer.addTo(map);
+    if (!show && map.hasLayer(layer)) layer.remove();
+  }, [zoom]);
 
   const finishStreet = () => {
     const pts = draftRef.current;
@@ -483,6 +523,27 @@ export function MapCanvas({
         <LanguageMenu />
         {onGeocodeClick ? <SearchGeocodeButton onClick={onGeocodeClick} /> : null}
       </div>
+      {zoom < GRID_MIN_ZOOM && (
+        <div style={{
+          position: 'absolute', top: 60, right: 14, zIndex: 600,
+          width: 196, maxHeight: '46%', overflow: 'auto',
+          background: 'rgba(255,255,255,0.94)',
+          border: '1px solid var(--gray-200)',
+          borderRadius: 8,
+          boxShadow: 'var(--shadow-md)',
+          padding: '8px 10px',
+        }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--navy-800)', marginBottom: 6 }}>
+            {m.rail.wilayaLegend}
+          </div>
+          {WILAYA_LEGEND.map((item) => (
+            <div key={item.pcode} style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
+              <span style={{ width: 12, height: 12, flex: '0 0 auto', background: item.color, border: '1px solid rgba(0,0,0,0.25)' }} />
+              <span style={{ fontSize: 11, lineHeight: 1.3, color: 'var(--gray-800)' }}>{item.name}</span>
+            </div>
+          ))}
+        </div>
+      )}
       <div style={{ position: 'absolute', right: 14, bottom: 26, zIndex: 600 }}>
         <MapZoomControl level={zoom}
           onZoomIn={() => mapRef.current?.zoomIn()}

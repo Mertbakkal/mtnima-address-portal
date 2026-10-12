@@ -366,6 +366,11 @@ export function AppShell() {
             <div style={{ pointerEvents: 'auto', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               <DynamicQueryPanel
                 onClose={() => { setSearchOpen(false); setModule(null); }}
+                onLocatePlace={(focus) => {
+                  setFocusRequest({ ...focus, id: Date.now() });
+                  setSearchOpen(false);
+                  setModule(null);
+                }}
               />
             </div>
           </div>

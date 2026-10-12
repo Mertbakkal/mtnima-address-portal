@@ -10,11 +10,14 @@ import {
 import { BulkUpdateModal } from './BulkUpdateModal';
 import { useI18n } from '../i18n/LocaleProvider';
 import { catalogLabel } from '../i18n/messages';
+import { searchAdminPlaces, wilayaFill, type AdminPlaceHit } from '../data/adminBoundaries';
+import type { MapFocus } from '../data/hierarchySearch';
 
 const VALUE_COLUMNS = new Set<PreviewColumnKey>(['buildingType', 'useType', 'namingStatus', 'validationStatus']);
 
 export interface DynamicQueryPanelProps {
   onClose: () => void;
+  onLocatePlace?: (focus: MapFocus) => void;
 }
 
 function ToolIconButton({
@@ -58,7 +61,7 @@ function ToolIconButton({
   );
 }
 
-export function DynamicQueryPanel({ onClose }: DynamicQueryPanelProps) {
+export function DynamicQueryPanel({ onClose, onLocatePlace }: DynamicQueryPanelProps) {
   const { m } = useI18n();
   const columnLabels: Record<PreviewColumnKey, string> = {
     digitalAddress: m.query.digitalAddress,
@@ -83,6 +86,12 @@ export function DynamicQueryPanel({ onClose }: DynamicQueryPanelProps) {
   const [search, setSearch] = useState('');
   const [columnFilters, setColumnFilters] = useState<Partial<Record<PreviewColumnKey, string>>>({});
   const [openFilter, setOpenFilter] = useState<PreviewColumnKey | null>(null);
+  const boundaryHits = searchAdminPlaces(search);
+  const levelLabel = (hit: AdminPlaceHit) => {
+    if (hit.level === 'wilaya') return m.query.wilaya;
+    if (hit.level === 'moughataa') return `${m.query.moughataa} · ${hit.wilaya}`;
+    return `${m.query.commune} · ${hit.moughataa} · ${hit.wilaya}`;
+  };
 
   const cellText = (row: QueryPreviewRow, key: PreviewColumnKey) => {
     const raw = row[key];
@@ -331,6 +340,49 @@ export function DynamicQueryPanel({ onClose }: DynamicQueryPanelProps) {
                   />
                 </label>
               </div>
+
+              {boundaryHits.length > 0 && (
+                <div style={{
+                  marginBottom: 'var(--space-4)',
+                  border: '1px solid var(--border-panel)',
+                  borderRadius: 8,
+                  overflow: 'hidden',
+                }}>
+                  <div style={{
+                    padding: '6px 10px',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: 'var(--navy-800)',
+                    background: 'var(--gray-50)',
+                  }}>
+                    {m.query.boundaries}
+                  </div>
+                  {boundaryHits.map((hit) => (
+                    <button
+                      key={hit.id}
+                      type="button"
+                      onClick={() => onLocatePlace?.({ lat: hit.lat, lon: hit.lon, zoom: hit.zoom })}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '7px 10px',
+                        border: 'none',
+                        borderTop: '1px solid var(--border-panel)',
+                        background: 'var(--surface-page)',
+                        cursor: onLocatePlace ? 'pointer' : 'default',
+                        textAlign: 'left',
+                        fontFamily: 'var(--font-ui)',
+                      }}
+                    >
+                      <span style={{ width: 12, height: 12, flex: '0 0 auto', background: wilayaFill(hit.pcode), border: '1px solid rgba(0,0,0,0.25)' }} />
+                      <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--gray-800)' }}>{hit.name}</span>
+                      <span style={{ fontSize: 11, color: 'var(--gray-600)' }}>{levelLabel(hit)}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
 
               <div style={{
                 width: '100%',

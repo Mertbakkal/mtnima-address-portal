@@ -1,3 +1,5 @@
+import { ADMIN_PLACES } from './adminBoundaries';
+
 export interface MapFocus {
   lat: number;
   lon: number;
@@ -34,111 +36,45 @@ export interface HierarchySelection {
   street?: string;
 }
 
-export const HIERARCHY_TREE: HierarchyWilaya[] = [
-  {
-    name: 'Nouakchott',
-    focus: { lat: 18.0895, lon: -15.9755, zoom: 11 },
-    moughataas: [
-      {
-        name: 'Tevragh Zeina',
-        focus: { lat: 18.1, lon: -15.99, zoom: 13 },
-        communes: [
-          {
-            name: 'Tevragh Zeina',
-            focus: { lat: 18.102, lon: -15.988, zoom: 14 },
-            streets: [
-              { name: "Rue de l'Amitié", focus: { lat: 18.1035, lon: -15.9865, zoom: 17 } },
-              { name: 'Avenue Gamal Abdel Nasser', focus: { lat: 18.101, lon: -15.991, zoom: 16 } },
-              { name: 'Rue Mamadou Konaté', focus: { lat: 18.1045, lon: -15.984, zoom: 17 } },
-            ],
-          },
-          {
-            name: 'Ksar',
-            focus: { lat: 18.095, lon: -15.97, zoom: 14 },
-            streets: [
-              { name: 'Boulevard Général de Gaulle', focus: { lat: 18.096, lon: -15.968, zoom: 16 } },
-              { name: 'Rue de la Corniche', focus: { lat: 18.093, lon: -15.972, zoom: 17 } },
-            ],
-          },
-        ],
-      },
-      {
-        name: 'Ksar',
-        focus: { lat: 18.085, lon: -15.96, zoom: 13 },
-        communes: [
-          {
-            name: 'Ksar',
-            focus: { lat: 18.086, lon: -15.958, zoom: 14 },
-            streets: [
-              { name: 'Avenue Mokhtar Ould Daddah', focus: { lat: 18.087, lon: -15.956, zoom: 16 } },
-              { name: 'Rue 42-150', focus: { lat: 18.084, lon: -15.961, zoom: 17 } },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    name: 'Nouakchott Ouest',
-    focus: { lat: 18.07, lon: -16.0, zoom: 11 },
-    moughataas: [
-      {
-        name: 'Tevragh Zeina',
-        focus: { lat: 18.075, lon: -16.005, zoom: 13 },
-        communes: [
-          {
-            name: 'Commune 1',
-            focus: { lat: 18.076, lon: -16.003, zoom: 14 },
-            streets: [
-              { name: 'Rue Principale', focus: { lat: 18.077, lon: -16.002, zoom: 17 } },
-              { name: 'Avenue de la Plage', focus: { lat: 18.074, lon: -16.008, zoom: 16 } },
-            ],
-          },
-          {
-            name: 'Commune 2',
-            focus: { lat: 18.072, lon: -15.998, zoom: 14 },
-            streets: [
-              { name: 'Rue du Marché', focus: { lat: 18.073, lon: -15.997, zoom: 17 } },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    name: 'Nouakchott Nord',
-    focus: { lat: 18.12, lon: -15.95, zoom: 11 },
-    moughataas: [
-      {
-        name: 'Dar Naim',
-        focus: { lat: 18.125, lon: -15.945, zoom: 13 },
-        communes: [
-          {
-            name: 'Dar Naim 1',
-            focus: { lat: 18.126, lon: -15.944, zoom: 14 },
-            streets: [
-              { name: 'Avenue Dar Naim', focus: { lat: 18.127, lon: -15.943, zoom: 16 } },
-              { name: 'Rue 12-050', focus: { lat: 18.124, lon: -15.946, zoom: 17 } },
-            ],
-          },
-        ],
-      },
-      {
-        name: 'Teyaret',
-        focus: { lat: 18.115, lon: -15.955, zoom: 13 },
-        communes: [
-          {
-            name: 'Teyaret',
-            focus: { lat: 18.116, lon: -15.954, zoom: 14 },
-            streets: [
-              { name: 'Boulevard Teyaret', focus: { lat: 18.117, lon: -15.953, zoom: 16 } },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-];
+function focusOf(place: { lat: number; lon: number; zoom: number }): MapFocus {
+  return { lat: place.lat, lon: place.lon, zoom: place.zoom };
+}
+
+function buildHierarchy(): HierarchyWilaya[] {
+  const wilayas = new Map<string, HierarchyWilaya>();
+  for (const place of ADMIN_PLACES) {
+    if (place.level !== 'wilaya') continue;
+    wilayas.set(place.name, { name: place.name, focus: focusOf(place), moughataas: [] });
+  }
+
+  const moughataas = new Map<string, HierarchyMoughataa>();
+  for (const place of ADMIN_PLACES) {
+    if (place.level !== 'moughataa') continue;
+    const parent = wilayas.get(place.wilaya);
+    if (!parent) continue;
+    const node: HierarchyMoughataa = { name: place.name, focus: focusOf(place), communes: [] };
+    parent.moughataas.push(node);
+    moughataas.set(place.wilaya + '\0' + place.name, node);
+  }
+
+  for (const place of ADMIN_PLACES) {
+    if (place.level !== 'commune') continue;
+    const parent = moughataas.get(place.wilaya + '\0' + place.moughataa);
+    if (!parent) continue;
+    parent.communes.push({ name: place.name, focus: focusOf(place), streets: [] });
+  }
+
+  for (const wilaya of wilayas.values()) {
+    wilaya.moughataas.sort((a, b) => a.name.localeCompare(b.name));
+    for (const moughataa of wilaya.moughataas) {
+      moughataa.communes.sort((a, b) => a.name.localeCompare(b.name));
+    }
+  }
+  return [...wilayas.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/** Wilaya, moughataa, and commune lists from the Limites_admin boundaries. */
+export const HIERARCHY_TREE: HierarchyWilaya[] = buildHierarchy();
 
 export function resolveHierarchyFocus(selection: HierarchySelection): MapFocus | null {
   if (!selection.wilaya) return null;
